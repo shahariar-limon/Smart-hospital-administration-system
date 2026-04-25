@@ -1,0 +1,885 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vaccination - SmartCare</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <style>
+        .vaccine-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .vaccine-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateY(-5px);
+        }
+        .vaccine-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: inline-block;
+        }
+        .age-group-badge {
+            background-color: #17a2b8;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .available-badge {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .unavailable-badge {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status-pending {
+            background-color: #ffc107;
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status-completed {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status-cancelled {
+            background-color: #6c757d;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .vaccine-info-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .info-card i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .date-picker-modal {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .date-picker-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        .date-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .close-modal {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #999;
+        }
+        .close-modal:hover {
+            color: #333;
+        }
+        .tab-content-section {
+            min-height: 400px;
+        }
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="d-flex justify-content-around align-items-center p-4">
+        <div class="logo-container d-flex align-items-center gap-2">
+            <img src="{% static 'images/stethoscope 1.png' %}" alt="SmartCare Logo" />
+            <h3>SmartCare</h3>
+        </div>
+        <div class="menu-container d-flex gap-3 align-items-center">
+            <ul class="d-flex gap-3 list-unstyled mb-0">
+                <li class="menu"><a href="{% url 'home' %}">Home</a></li>
+                <li class="menu"><a href="{% url 'home' %}#services">Services</a></li>
+                <li class="menu"><a href="{% url 'home' %}#contact">Contact us</a></li>
+                <li class="menu"><a href="{% url 'login' %}">Login</a></li>
+            </ul>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button"
+                        id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user"></i> Profile
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                    <li>
+                        <a class="dropdown-item" href="{% url 'user_details' %}">
+                            <i class="fas fa-user-circle"></i> My Profile
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'all_appointments' %}">
+                            <i class="fas fa-calendar-check"></i> All Appointments
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li onclick="handlelogOut()">
+                        <a class="dropdown-item" href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="container text-center">
+            <i class="fas fa-syringe fa-4x mb-3"></i>
+            <h1 class="display-4 fw-bold">Vaccination Services</h1>
+            <p class="lead">Protect yourself and your loved ones with our comprehensive vaccination program</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mb-5">
+        <!-- Vaccination Information -->
+        <div class="vaccine-info-section">
+            <h2 class="text-center mb-4 fw-bold">Why Vaccination Matters</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="info-card">
+                        <i class="fas fa-shield-alt text-primary"></i>
+                        <h5 class="fw-bold">Protection</h5>
+                        <p>Vaccines protect against serious diseases and their complications</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card">
+                        <i class="fas fa-users text-success"></i>
+                        <h5 class="fw-bold">Community Health</h5>
+                        <p>Help protect vulnerable populations through herd immunity</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card">
+                        <i class="fas fa-calendar-check text-info"></i>
+                        <h5 class="fw-bold">Stay Updated</h5>
+                        <p>Keep your vaccinations on schedule for maximum effectiveness</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-pills nav-fill mb-4" id="vaccineTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="available-tab" data-bs-toggle="pill" 
+                        data-bs-target="#available" type="button" role="tab">
+                    <i class="fas fa-list"></i> Available Vaccines
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="records-tab" data-bs-toggle="pill" 
+                        data-bs-target="#records" type="button" role="tab">
+                    <i class="fas fa-file-medical"></i> My Records
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="schedule-tab" data-bs-toggle="pill" 
+                        data-bs-target="#schedule" type="button" role="tab">
+                    <i class="fas fa-calendar-alt"></i> Vaccination Schedule
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tabs Content -->
+        <div class="tab-content tab-content-section" id="vaccineTabContent">
+            <!-- Available Vaccines Tab -->
+            <div class="tab-pane fade show active" id="available" role="tabpanel">
+                <h3 class="mb-4"><i class="fas fa-syringe text-primary"></i> Available Vaccines</h3>
+                
+                <!-- Filter Options -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <select class="form-select" id="ageGroupFilter">
+                            <option value="">All Age Groups</option>
+                            <option value="infant">Infant (0-1 year)</option>
+                            <option value="child">Child (1-12 years)</option>
+                            <option value="teen">Teen (13-17 years)</option>
+                            <option value="adult">Adult (18+ years)</option>
+                            <option value="elderly">Elderly (65+ years)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="searchVaccine" placeholder="Search vaccines...">
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary w-100" onclick="loadVaccines()">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Vaccines List -->
+                <div id="vaccinesList">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading available vaccines...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Records Tab -->
+            <div class="tab-pane fade" id="records" role="tabpanel">
+                <h3 class="mb-4"><i class="fas fa-file-medical text-success"></i> My Vaccination Records</h3>
+                
+                <div class="alert alert-info" id="loginAlert" style="display: none;">
+                    <i class="fas fa-info-circle"></i> Please login to view your vaccination records.
+                </div>
+
+                <div id="recordsList">
+                    <!-- Records will be loaded dynamically -->
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading your vaccination records...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vaccination Schedule Tab -->
+            <div class="tab-pane fade" id="schedule" role="tabpanel">
+                <h3 class="mb-4"><i class="fas fa-calendar-alt text-info"></i> Recommended Vaccination Schedule</h3>
+                
+                <div class="accordion" id="scheduleAccordion">
+                    <!-- Infant Schedule -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#infantSchedule">
+                                <i class="fas fa-baby me-2"></i> Infant (0-1 year)
+                            </button>
+                        </h2>
+                        <div id="infantSchedule" class="accordion-collapse collapse show" 
+                             data-bs-parent="#scheduleAccordion">
+                            <div class="accordion-body">
+                                <ul class="list-group">
+                                    <li class="list-group-item">
+                                        <strong>Birth:</strong> Hepatitis B (1st dose), BCG
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>2 months:</strong> DTaP, IPV, Hib, PCV13, Rotavirus
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>4 months:</strong> DTaP, IPV, Hib, PCV13, Rotavirus
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>6 months:</strong> DTaP, IPV, Hib, PCV13, Hepatitis B (3rd dose)
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>9 months:</strong> Measles, Mumps, Rubella (MMR - 1st dose)
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Child Schedule -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#childSchedule">
+                                <i class="fas fa-child me-2"></i> Child (1-12 years)
+                            </button>
+                        </h2>
+                        <div id="childSchedule" class="accordion-collapse collapse" 
+                             data-bs-parent="#scheduleAccordion">
+                            <div class="accordion-body">
+                                <ul class="list-group">
+                                    <li class="list-group-item">
+                                        <strong>12-15 months:</strong> Varicella, Hepatitis A (1st dose)
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>15-18 months:</strong> DTaP (4th dose), MMR (2nd dose)
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>4-6 years:</strong> DTaP, IPV, MMR, Varicella
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>11-12 years:</strong> Tdap, HPV, Meningococcal
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Adult Schedule -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#adultSchedule">
+                                <i class="fas fa-user me-2"></i> Adult (18+ years)
+                            </button>
+                        </h2>
+                        <div id="adultSchedule" class="accordion-collapse collapse" 
+                             data-bs-parent="#scheduleAccordion">
+                            <div class="accordion-body">
+                                <ul class="list-group">
+                                    <li class="list-group-item">
+                                        <strong>Annual:</strong> Influenza vaccine
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Every 10 years:</strong> Tdap or Td booster
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Age 50+:</strong> Shingles vaccine (Shingrix)
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Age 65+:</strong> Pneumococcal vaccine (PCV13, PPSV23)
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>As recommended:</strong> COVID-19, HPV (up to age 26)
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Picker Modal -->
+    <div id="datePickerModal" class="date-picker-modal">
+        <div class="date-picker-content">
+            <div class="date-picker-header">
+                <h4 id="modalVaccineName">Book Appointment</h4>
+                <span class="close-modal" onclick="closeDatePicker()">&times;</span>
+            </div>
+            <div class="mb-3">
+                <label for="appointmentDate" class="form-label">
+                    <i class="fas fa-calendar"></i> Select Appointment Date
+                </label>
+                <input type="date" class="form-control" id="appointmentDate" required>
+                <small class="text-muted">Please select a date for your vaccination appointment</small>
+            </div>
+            <div class="mb-3">
+                <label for="appointmentTime" class="form-label">
+                    <i class="fas fa-clock"></i> Select Time (Optional)
+                </label>
+                <input type="time" class="form-control" id="appointmentTime" value="10:00">
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary flex-grow-1" onclick="confirmBooking()">
+                    <i class="fas fa-check"></i> Confirm Booking
+                </button>
+                <button class="btn btn-secondary" onclick="closeDatePicker()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-2">&copy; 2025 SmartCare Hospital. All rights reserved.</p>
+            <p class="mb-0">
+                <i class="fas fa-phone"></i> Emergency: 999 | 
+                <i class="fas fa-envelope ms-3"></i> info@smartcare.com
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+            crossorigin="anonymous"></script>
+
+    <script>
+        // Check if user is authenticated
+        function isAuthenticated() {
+            const token = localStorage.getItem('token');
+            return token !== null && token !== '';
+        }
+
+        // Load vaccines from API
+        function loadVaccines() {
+            const ageGroup = document.getElementById('ageGroupFilter').value;
+            const searchTerm = document.getElementById('searchVaccine').value;
+            
+            let url = '/vaccine/vaccines/';
+            const params = new URLSearchParams();
+            
+            if (ageGroup) params.append('age_group', ageGroup);
+            if (searchTerm) params.append('search', searchTerm);
+            
+            if (params.toString()) url += '?' + params.toString();
+            
+            const headers = {};
+            if (isAuthenticated()) {
+                headers['Authorization'] = 'Token ' + localStorage.getItem('token');
+            }
+            
+            fetch(url, { headers })
+                .then(response => response.json())
+                .then(vaccines => {
+                    const vaccinesList = document.getElementById('vaccinesList');
+                    
+                    if (!Array.isArray(vaccines) || vaccines.length === 0) {
+                        vaccinesList.innerHTML = '<div class="alert alert-info"><i class="fas fa-info-circle"></i> No vaccines found. Please contact admin to add vaccines to the system.</div>';
+                        return;
+                    }
+                    
+                    vaccinesList.innerHTML = '';
+                    vaccines.forEach(vaccine => {
+                        const availableBadge = vaccine.is_available ? 
+                            '<span class="available-badge">Available</span>' : 
+                            '<span class="unavailable-badge">Not Available</span>';
+                        
+                        const cardHtml = `
+                            <div class="vaccine-card">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h4 class="fw-bold mb-2">${vaccine.name}</h4>
+                                        <span class="age-group-badge me-2">${vaccine.age_group}</span>
+                                        ${availableBadge}
+                                    </div>
+                                    <span class="vaccine-badge">${vaccine.manufacturer}</span>
+                                </div>
+                                <p><strong>Disease Prevented:</strong> ${vaccine.disease_prevented}</p>
+                                <p><strong>Manufacturer:</strong> ${vaccine.manufacturer}</p>
+                                <p><strong>Doses Required:</strong> ${vaccine.total_doses} dose${vaccine.total_doses > 1 ? 's' : ''}${vaccine.dose_interval_days ? ' (' + vaccine.dose_interval_days + ' days apart)' : ''}</p>
+                                <p class="mb-3"><strong>Description:</strong> ${vaccine.description}</p>
+                                ${vaccine.is_available ? `
+                                <button class="btn btn-success" onclick="bookVaccine(${vaccine.id}, '${vaccine.name.replace(/'/g, "\\'")}')"> 
+                                    <i class="fas fa-calendar-plus"></i> Book Appointment
+                                </button>` : `
+                                <button class="btn btn-secondary" disabled>
+                                    <i class="fas fa-ban"></i> Not Available
+                                </button>`}
+                            </div>
+                        `;
+                        vaccinesList.innerHTML += cardHtml;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading vaccines:', error);
+                    document.getElementById('vaccinesList').innerHTML = 
+                        '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Failed to load vaccines.</div>';
+                });
+        }
+
+        // Store booking details temporarily
+        let bookingData = {};
+
+        // Book vaccine appointment - show date picker
+        function bookVaccine(vaccineId, vaccineName) {
+            if (!isAuthenticated()) {
+                alert('Please login to book an appointment.');
+                window.location.href = '/login/';
+                return;
+            }
+            
+            // Store vaccine details
+            bookingData = {
+                vaccineId: vaccineId,
+                vaccineName: vaccineName,
+                isRescheduling: false
+            };
+            
+            // Update modal title
+            document.getElementById('modalVaccineName').textContent = 'Book: ' + vaccineName;
+            
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('appointmentDate').setAttribute('min', today);
+            document.getElementById('appointmentDate').value = today;
+            
+            // Show modal
+            document.getElementById('datePickerModal').style.display = 'block';
+        }
+
+        // Close date picker modal
+        function closeDatePicker() {
+            document.getElementById('datePickerModal').style.display = 'none';
+            bookingData = {};
+        }
+
+        // Confirm booking
+        function confirmBooking() {
+            const selectedDate = document.getElementById('appointmentDate').value;
+            const selectedTime = document.getElementById('appointmentTime').value;
+            
+            if (!selectedDate) {
+                alert('Please select a date');
+                return;
+            }
+            
+            // Check if this is a reschedule or new booking
+            if (bookingData.isRescheduling) {
+                // Reschedule existing appointment
+                fetch('/vaccine/records/' + bookingData.appointmentId + '/', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Token ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({ scheduled_date: selectedDate })
+                })
+                .then(response => {
+                    if (response.ok || response.status === 200) {
+                        return response.json();
+                    } else {
+                        return response.json().then(data => {
+                            let errorMsg = 'Rescheduling failed';
+                            if (data.detail) {
+                                errorMsg = data.detail;
+                            } else if (data.error) {
+                                errorMsg = data.error;
+                            }
+                            throw new Error(errorMsg);
+                        });
+                    }
+                })
+                .then(data => {
+                    alert('Appointment rescheduled successfully to ' + selectedDate + '!');
+                    closeDatePicker();
+                    // Reload records to show updated date
+                    loadVaccinationRecords();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to reschedule appointment: ' + error.message);
+                });
+            } else {
+                // New booking
+                const bookingPayload = {
+                    vaccine: bookingData.vaccineId,
+                    scheduled_date: selectedDate,
+                    dose_number: 1,
+                    status: 'Scheduled'
+                };
+                
+                // Make API call to book appointment
+                fetch('/vaccine/records/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Token ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify(bookingPayload)
+                })
+                .then(response => {
+                    if (response.ok || response.status === 201) {
+                        return response.json();
+                    } else {
+                        return response.json().then(data => {
+                            console.error('Booking error response:', data);
+                            console.error('Response status:', response.status);
+                            // Extract error message from various possible formats
+                            let errorMsg = 'Booking failed';
+                            if (data.detail) {
+                                errorMsg = data.detail;
+                            } else if (data.error) {
+                                errorMsg = data.error;
+                            } else if (typeof data === 'object') {
+                                // Handle field-specific errors
+                                const errors = [];
+                                for (let field in data) {
+                                    if (Array.isArray(data[field])) {
+                                        errors.push(field + ': ' + data[field].join(', '));
+                                    } else {
+                                        errors.push(field + ': ' + data[field]);
+                                    }
+                                }
+                                if (errors.length > 0) {
+                                    errorMsg = errors.join('\n');
+                                }
+                            }
+                            throw new Error(errorMsg);
+                        }, () => {
+                            // If response is not JSON
+                            throw new Error('Booking failed with status: ' + response.status);
+                        });
+                    }
+                })
+                .then(data => {
+                    alert('Appointment booked successfully for ' + selectedDate + '!');
+                    closeDatePicker();
+                    // Switch to My Records tab to show the new booking
+                    const recordsTab = new bootstrap.Tab(document.getElementById('records-tab'));
+                    recordsTab.show();
+                    // Reload records
+                    loadVaccinationRecords();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to book appointment: ' + error.message);
+                });
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('datePickerModal');
+            if (event.target === modal) {
+                closeDatePicker();
+            }
+        }
+
+        // Reschedule appointment
+        function rescheduleAppointment(appointmentId, vaccineName, currentDate) {
+            if (!isAuthenticated()) {
+                alert('Please login to reschedule appointments.');
+                window.location.href = '/login/';
+                return;
+            }
+            
+            // Store reschedule details
+            bookingData = {
+                appointmentId: appointmentId,
+                vaccineName: vaccineName,
+                isRescheduling: true
+            };
+            
+            // Update modal title
+            document.getElementById('modalVaccineName').textContent = 'Reschedule: ' + vaccineName;
+            
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('appointmentDate').setAttribute('min', today);
+            document.getElementById('appointmentDate').value = currentDate || today;
+            
+            // Show modal
+            document.getElementById('datePickerModal').style.display = 'block';
+        }
+
+        // Load vaccination records
+        function loadVaccinationRecords() {
+            if (!isAuthenticated()) {
+                return;
+            }
+
+            fetch('/vaccine/records/', {
+                headers: {
+                    'Authorization': 'Token ' + localStorage.getItem('token')
+                }
+            })
+            .then(response => response.json())
+            .then(records => {
+                const recordsList = document.getElementById('recordsList');
+                if (records.length === 0) {
+                    recordsList.innerHTML = '<div class="alert alert-info"><i class="fas fa-info-circle"></i> No vaccination records found.</div>';
+                    return;
+                }
+
+                recordsList.innerHTML = '';
+                records.forEach(record => {
+                    const statusClass = record.status === 'Completed' ? 'status-completed' : 
+                                       record.status === 'Scheduled' ? 'status-pending' : 
+                                       record.status === 'Cancelled' ? 'status-cancelled' : 'status-missed';
+                    
+                    const cardHtml = `
+                        <div class="vaccine-card" id="record-${record.id}">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="fw-bold mb-2">${record.vaccine_name || 'Vaccine'} - Dose ${record.dose_number}</h5>
+                                    <span class="${statusClass}">${record.status}</span>
+                                </div>
+                                <span class="text-muted">${record.status === 'Completed' ? 'Administered' : 'Scheduled'}: ${record.scheduled_date}</span>
+                            </div>
+                            <p><strong>Vaccine:</strong> ${record.vaccine_name || 'N/A'}</p>
+                            <p><strong>Location:</strong> ${record.hospital_name || 'SmartCare Main Clinic'}</p>
+                            ${record.administered_by ? `<p><strong>Administered by:</strong> ${record.administered_by}</p>` : ''}
+                            ${record.status === 'Scheduled' ? `
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-warning" onclick="rescheduleAppointment(${record.id}, '${(record.vaccine_name || 'Vaccine').replace(/'/g, "\\'")}', '${record.scheduled_date}')">
+                                    <i class="fas fa-edit"></i> Reschedule
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="cancelAppointment(${record.id})">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </div>` : ''}
+                        </div>
+                    `;
+                    recordsList.innerHTML += cardHtml;
+                });
+            })
+            .catch(error => {
+                console.error('Error loading records:', error);
+                document.getElementById('recordsList').innerHTML = 
+                    '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Failed to load vaccination records.</div>';
+            });
+        }
+
+        // Cancel appointment
+        function cancelAppointment(appointmentId) {
+            if (!isAuthenticated()) {
+                alert('Please login to cancel appointments.');
+                window.location.href = '/login/';
+                return;
+            }
+            
+            // Directly delete the appointment without popup confirmation
+            fetch('/vaccine/records/' + appointmentId + '/', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Token ' + localStorage.getItem('token')
+                }
+            })
+            .then(response => {
+                if (response.ok || response.status === 204) {
+                    // Remove the card from DOM instead of reloading the page
+                    const cardElement = document.getElementById('record-' + appointmentId);
+                    if (cardElement) {
+                        cardElement.style.transition = 'opacity 0.3s';
+                        cardElement.style.opacity = '0';
+                        setTimeout(() => {
+                            cardElement.remove();
+                            // Check if there are any records left
+                            const recordsList = document.getElementById('recordsList');
+                            if (recordsList.children.length === 0) {
+                                recordsList.innerHTML = '<div class="alert alert-info"><i class="fas fa-info-circle"></i> No vaccination records found.</div>';
+                            }
+                        }, 300);
+                    }
+                    alert('Appointment cancelled successfully');
+                } else {
+                    return response.json().then(data => {
+                        alert('Failed to cancel appointment: ' + (data.detail || 'Unknown error'));
+                    }).catch(() => {
+                        alert('Failed to cancel appointment');
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while cancelling the appointment');
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load available vaccines
+            loadVaccines();
+            
+            // Check if user is logged in and update UI accordingly
+            if (!isAuthenticated()) {
+                const loginAlert = document.getElementById('loginAlert');
+                if (loginAlert) {
+                    loginAlert.style.display = 'block';
+                }
+                const recordsList = document.getElementById('recordsList');
+                if (recordsList) {
+                    recordsList.innerHTML = '';
+                }
+            } else {
+                // User is logged in, load vaccination records
+                const loginAlert = document.getElementById('loginAlert');
+                if (loginAlert) {
+                    loginAlert.style.display = 'none';
+                }
+                loadVaccinationRecords();
+            }
+        });
+    </script>
+
+    <!-- Footer -->
+    <footer class="p-5 mt-5" id="contact">
+        <div class="container w-75 m-auto row p-5">
+            <div class="col-md-6">
+                <h3 class="mb-3">SmartCare</h3>
+                <p><small>Copyright © SmartCare. All Rights Reserved</small></p>
+                <h5 class="mt-4">Follow Us</h5>
+                <div class="icons">
+                    <a href="https://www.linkedin.com" target="_blank"><i class="fab fa-linkedin fa-2x"></i></a>
+                    <a href="https://www.youtube.com" target="_blank"><i class="fab fa-youtube fa-2x"></i></a>
+                    <a href="https://www.facebook.com" target="_blank"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="https://www.twitter.com" target="_blank"><i class="fab fa-twitter fa-2x"></i></a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <h5>Company</h5>
+                <ul>
+                    <li><a href="{% url 'about_page' %}">About</a></li>
+                    <li><a href="{% url 'contact_us_page' %}">Contact Us</a></li>
+                    <li><a href="{% url 'careers_page' %}">Careers</a></li>
+                    <li><a href="{% url 'blog_page' %}">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Resources</h5>
+                <ul>
+                    <li><a href="{% url 'health_tips_page' %}">Health Tips</a></li>
+                    <li><a href="{% url 'doctors_page' %}">Find a Doctor</a></li>
+                    <li><a href="{% url 'all_appointments' %}">Appointments</a></li>
+                    <li><a href="{% url 'faq_page' %}">FAQ</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr />
+        <p class="text-center mt-3">
+            <small>Copyright © SmartCare 2024. All Rights Reserved</small>
+        </p>
+    </footer>
+</body>
+</html>

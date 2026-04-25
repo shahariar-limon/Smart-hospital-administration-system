@@ -1,0 +1,549 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Appointment - SmartCare</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <style>
+        .booking-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .booking-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .booking-header h1 {
+            color: #1CA8C7;
+            font-weight: 700;
+        }
+
+        .booking-header p {
+            color: #6c757d;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #1CA8C7;
+            box-shadow: 0 0 0 0.2rem rgba(28, 168, 199, 0.25);
+        }
+
+        .time-slot-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .time-slot {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        .time-slot:hover {
+            border-color: #1CA8C7;
+            background: #f8f9fa;
+        }
+
+        .time-slot.selected {
+            background: #1CA8C7;
+            color: white;
+            border-color: #1CA8C7;
+        }
+
+        .time-slot.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f8f9fa;
+        }
+
+        .doctor-info-card {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .doctor-info-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #1CA8C7;
+        }
+
+        .btn-book {
+            background: linear-gradient(135deg, #1CA8C7, #439FA5);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-book:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(28, 168, 199, 0.3);
+        }
+
+        .alert-custom {
+            border-radius: 10px;
+            border-left: 4px solid #1CA8C7;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="d-flex justify-content-around align-items-center p-4">
+        <div class="logo-container d-flex align-items-center gap-2">
+            <img src="{% static 'images/stethoscope 1.png' %}" alt="SmartCare Logo" />
+            <h3>SmartCare</h3>
+        </div>
+        <div class="menu-container d-flex gap-3 align-items-center">
+            <ul class="d-flex gap-3 list-unstyled mb-0">
+                <li class="menu"><a href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a></li>
+                <li class="menu"><a href="{% url 'home' %}#services"><i class="fas fa-concierge-bell"></i> Services</a></li>
+                <li class="menu"><a href="{% url 'home' %}#contact"><i class="fas fa-envelope"></i> Contact us</a></li>
+            </ul>
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button"
+                        id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user"></i> Profile
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                    <li>
+                        <a class="dropdown-item" href="{% url 'user_details' %}">
+                            <i class="fas fa-user-circle"></i> My Profile
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'all_appointments' %}">
+                            <i class="fas fa-calendar-check"></i> All Appointments
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Booking Container -->
+    <div class="container">
+        <div class="booking-container">
+            <div class="booking-header">
+                <h1><i class="fas fa-calendar-plus"></i> Book Appointment</h1>
+                <p>Fill in the details below to schedule your appointment</p>
+            </div>
+
+            <!-- Alert Messages -->
+            <div id="alertContainer"></div>
+
+            <!-- Doctor Selection (if not pre-selected) -->
+            <div class="mb-4">
+                <label for="doctorSelect" class="form-label">
+                    <i class="fas fa-user-md"></i> Select Doctor
+                </label>
+                <select class="form-select" id="doctorSelect" required>
+                    <option value="">Choose a doctor...</option>
+                </select>
+            </div>
+
+            <!-- Selected Doctor Info -->
+            <div id="doctorInfoCard" class="doctor-info-card d-none">
+                <div class="d-flex align-items-center gap-3">
+                    <img id="doctorImage" src="" alt="Doctor">
+                    <div>
+                        <h5 id="doctorName" class="mb-1"></h5>
+                        <p id="doctorSpecialization" class="mb-1 text-muted"></p>
+                        <p id="doctorFee" class="mb-0 text-primary fw-bold"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointment Form -->
+            <form id="appointmentForm">
+                {% csrf_token %}
+                <!-- Appointment Type -->
+                <div class="mb-4">
+                    <label for="appointmentType" class="form-label">
+                        <i class="fas fa-laptop-medical"></i> Appointment Type
+                    </label>
+                    <select class="form-select" id="appointmentType" required>
+                        <option value="">Select type...</option>
+                        <option value="Online">Online (Video Consultation)</option>
+                        <option value="Offline">Offline (In-Person Visit)</option>
+                    </select>
+                </div>
+
+                <!-- Symptom/Reason -->
+                <div class="mb-4">
+                    <label for="symptom" class="form-label">
+                        <i class="fas fa-notes-medical"></i> Symptoms / Reason for Visit
+                    </label>
+                    <textarea class="form-control" id="symptom" rows="4" 
+                              placeholder="Please describe your symptoms or reason for consultation..." 
+                              required></textarea>
+                    <div class="form-text">
+                        Provide as much detail as possible to help the doctor prepare for your consultation.
+                    </div>
+                </div>
+
+                <!-- Available Time Slots -->
+                <div class="mb-4">
+                    <label class="form-label">
+                        <i class="fas fa-clock"></i> Select Time Slot
+                    </label>
+                    <div id="timeSlotContainer" class="time-slot-container">
+                        <!-- Time slots will be loaded here -->
+                        <div class="text-center text-muted py-4">
+                            <p>Please select a doctor to see available time slots</p>
+                        </div>
+                    </div>
+                    <input type="hidden" id="selectedTimeSlot" required>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary btn-book">
+                        <i class="fas fa-check-circle"></i> Confirm Appointment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container text-center py-4">
+            <p class="mb-0">&copy; 2024 SmartCare. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+            crossorigin="anonymous"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        let selectedTimeSlotId = null;
+        let doctors = [];
+
+        // Get CSRF token from cookie
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Get CSRF token - try cookie first, then form token
+        function getCSRFToken() {
+            let token = getCookie('csrftoken');
+            if (!token) {
+                // Try to get from form's csrf token input
+                const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+                if (csrfInput) {
+                    token = csrfInput.value;
+                }
+            }
+            return token;
+        }
+
+        // Show alert message
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show alert-custom`;
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Show/hide loading overlay
+        function toggleLoading(show) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (show) {
+                overlay.classList.add('active');
+            } else {
+                overlay.classList.remove('active');
+            }
+        }
+
+        // Load all doctors
+        async function loadDoctors() {
+            try {
+                toggleLoading(true);
+                const response = await fetch(`${API_BASE_URL}/doctor/list/`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Handle paginated response (data.results) or direct array
+                doctors = data.results || data;
+                
+                const doctorSelect = document.getElementById('doctorSelect');
+                doctorSelect.innerHTML = '<option value="">Choose a doctor...</option>';
+                
+                doctors.forEach(doctor => {
+                    const option = document.createElement('option');
+                    option.value = doctor.id;
+                    option.textContent = `Dr. ${doctor.user.first_name} ${doctor.user.last_name} - ${doctor.specialization.map(s => s.name).join(', ')}`;
+                    doctorSelect.appendChild(option);
+                });
+                
+                toggleLoading(false);
+            } catch (error) {
+                console.error('Error loading doctors:', error);
+                showAlert('Failed to load doctors. Please try again.', 'danger');
+                toggleLoading(false);
+            }
+        }
+
+        // Load doctor details and time slots
+        async function loadDoctorDetails(doctorId) {
+            if (!doctorId) {
+                document.getElementById('doctorInfoCard').classList.add('d-none');
+                document.getElementById('timeSlotContainer').innerHTML = '<div class="text-center text-muted py-4"><p>Please select a doctor to see available time slots</p></div>';
+                return;
+            }
+
+            try {
+                const doctor = doctors.find(d => d.id == doctorId);
+                if (!doctor) return;
+
+                // Show doctor info
+                const doctorInfoCard = document.getElementById('doctorInfoCard');
+                document.getElementById('doctorImage').src = doctor.image || "{% static 'images/doc.png' %}";
+                document.getElementById('doctorName').textContent = `Dr. ${doctor.user.first_name} ${doctor.user.last_name}`;
+                document.getElementById('doctorSpecialization').textContent = doctor.specialization.map(s => s.name).join(', ');
+                document.getElementById('doctorFee').textContent = `Fee: ৳${doctor.fee}`;
+                doctorInfoCard.classList.remove('d-none');
+
+                // Load time slots
+                const timeSlotContainer = document.getElementById('timeSlotContainer');
+                timeSlotContainer.innerHTML = '';
+
+                if (doctor.available_time && doctor.available_time.length > 0) {
+                    doctor.available_time.forEach(time => {
+                        const timeSlot = document.createElement('div');
+                        timeSlot.className = 'time-slot';
+                        timeSlot.textContent = time.name;
+                        timeSlot.dataset.timeId = time.id;
+                        timeSlot.onclick = () => selectTimeSlot(time.id, timeSlot);
+                        timeSlotContainer.appendChild(timeSlot);
+                    });
+                } else {
+                    timeSlotContainer.innerHTML = '<div class="text-center text-muted py-4"><p>No available time slots for this doctor</p></div>';
+                }
+            } catch (error) {
+                console.error('Error loading doctor details:', error);
+                showAlert('Failed to load doctor details.', 'danger');
+            }
+        }
+
+        // Select time slot
+        function selectTimeSlot(timeId, element) {
+            // Remove previous selection
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.classList.remove('selected');
+            });
+
+            // Add selection to clicked slot
+            element.classList.add('selected');
+            selectedTimeSlotId = timeId;
+            document.getElementById('selectedTimeSlot').value = timeId;
+        }
+
+        // Handle form submission
+        document.getElementById('appointmentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const patientId = localStorage.getItem('patient_id');
+            if (!patientId) {
+                showAlert('Please login to book an appointment.', 'danger');
+                setTimeout(() => {
+                    window.location.href = "{% url 'login' %}";
+                }, 2000);
+                return;
+            }
+
+            const doctorId = document.getElementById('doctorSelect').value;
+            const appointmentType = document.getElementById('appointmentType').value;
+            const symptom = document.getElementById('symptom').value;
+
+            if (!doctorId || !appointmentType || !symptom || !selectedTimeSlotId) {
+                showAlert('Please fill in all required fields.', 'warning');
+                return;
+            }
+
+            const appointmentData = {
+                patient: patientId,
+                doctor: doctorId,
+                appointment_types: appointmentType,
+                symptom: symptom,
+                time: selectedTimeSlotId,
+                appointment_status: 'Pending',
+                cancel: false
+            };
+
+            try {
+                toggleLoading(true);
+                const csrftoken = getCSRFToken();
+                
+                if (!csrftoken) {
+                    console.error('CSRF token not found!');
+                    showAlert('Security token missing. Please refresh the page and try again.', 'danger');
+                    toggleLoading(false);
+                    return;
+                }
+
+                console.log('Sending appointment data:', appointmentData);
+                
+                const response = await fetch(`${API_BASE_URL}/appointment/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken,
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(appointmentData)
+                });
+
+                console.log('Response status:', response.status);
+
+                if (response.ok) {
+                    showAlert('Appointment booked successfully! Redirecting to your appointments...', 'success');
+                    setTimeout(() => {
+                        window.location.href = "{% url 'all_appointments' %}";
+                    }, 2000);
+                } else {
+                    const errorData = await response.json().catch(() => ({ detail: response.statusText }));
+                    console.error('Error response:', errorData);
+                    const errorMessage = errorData.detail || errorData.error || JSON.stringify(errorData);
+                    showAlert(`Failed to book appointment: ${errorMessage}`, 'danger');
+                }
+            } catch (error) {
+                console.error('Error booking appointment:', error);
+                showAlert(`An error occurred while booking the appointment: ${error.message}. Please try again.`, 'danger');
+            } finally {
+                toggleLoading(false);
+            }
+        });
+
+        // Event listener for doctor selection
+        document.getElementById('doctorSelect').addEventListener('change', (e) => {
+            loadDoctorDetails(e.target.value);
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is logged in
+            const patientId = localStorage.getItem('patient_id');
+            if (!patientId) {
+                showAlert('Please login to book an appointment.', 'warning');
+                setTimeout(() => {
+                    window.location.href = "{% url 'login' %}";
+                }, 2000);
+                return;
+            }
+
+            loadDoctors();
+
+            // Check if doctor ID is in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const doctorId = urlParams.get('doctor');
+            if (doctorId) {
+                setTimeout(() => {
+                    document.getElementById('doctorSelect').value = doctorId;
+                    loadDoctorDetails(doctorId);
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>

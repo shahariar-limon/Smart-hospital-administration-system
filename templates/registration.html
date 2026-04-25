@@ -1,0 +1,201 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registration - SmartCare</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="d-flex justify-content-around align-items-center p-4">
+        <div class="logo-container d-flex align-items-center gap-2">
+            <img src="{% static 'images/stethoscope 1.png' %}" alt="SmartCare Logo" />
+            <h3>SmartCare</h3>
+        </div>
+        <div class="menu-container d-flex gap-3">
+            <ul class="d-flex gap-3 list-unstyled mb-0">
+                <li class="menu"><a href="{% url 'home' %}"><i class="fas fa-home"></i> Home</a></li>
+                <li class="menu"><a href="{% url 'home' %}#services"><i class="fas fa-concierge-bell"></i> Services</a></li>
+                <li class="menu"><a href="{% url 'home' %}#contact"><i class="fas fa-envelope"></i> Contact us</a></li>
+                <li class="menu"><a href="{% url 'login' %}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Registration Container -->
+    <div class="login-container">
+        <div class="col-md-6">
+            <h1 class="title mt-5">
+                <i class="fas fa-user-plus"></i> Create Account
+            </h1>
+            <form onsubmit="handleRegistration(event)">
+                {% csrf_token %}
+                <p id="error" class="text-danger text-center fw-bold"></p>
+                <p id="success" class="text-success text-center fw-bold"></p>
+
+                <div class="form-group">
+                    <label for="username" class="form-label">
+                        <i class="fas fa-user"></i> Username
+                    </label>
+                    <input id="username" type="text" class="input"
+                           placeholder="Choose a username" required />
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="first_name" class="form-label">
+                                <i class="fas fa-id-card"></i> First Name
+                            </label>
+                            <input id="first_name" type="text" class="input"
+                                   placeholder="Your first name" required />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="last_name" class="form-label">
+                                <i class="fas fa-id-card"></i> Last Name
+                            </label>
+                            <input id="last_name" type="text" class="input"
+                                   placeholder="Your last name" required />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input id="email" type="email" class="input"
+                           placeholder="your.email@example.com" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <div class="password-container position-relative">
+                        <input id="password" type="password" class="input"
+                               placeholder="Create a strong password" required />
+                        <i class="fas fa-eye toggle-password position-absolute end-0 top-50 translate-middle-y me-3"
+                           onclick="togglePassword('password')"></i>
+                    </div>
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i>
+                        Password must be at least 8 characters with letters and numbers
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password" class="form-label">
+                        <i class="fas fa-lock"></i> Confirm Password
+                    </label>
+                    <div class="password-container position-relative">
+                        <input id="confirm_password" type="password" class="input"
+                               placeholder="Re-enter your password" required />
+                        <i class="fas fa-eye toggle-password position-absolute end-0 top-50 translate-middle-y me-3"
+                           onclick="togglePassword('confirm_password')"></i>
+                    </div>
+                </div>
+
+                <div class="remember-me">
+                    <input type="checkbox" id="terms" name="terms" required />
+                    <label for="terms">
+                        I agree to the <a href="{% url 'terms_page' %}" class="text-primary" target="_blank">Terms and Conditions</a>
+                    </label>
+                </div>
+
+                <input type="submit" class="submit-btn" value="Create Account" />
+
+                <p class="text-center mt-3">
+                    Already have an account?
+                    <a href="{% url 'login' %}">
+                        <i class="fas fa-sign-in-alt"></i> Login here
+                    </a>
+                </p>
+            </form>
+        </div>
+        <div class="col-md-6 text-center">
+            <img class="w-100" src="{% static 'images/login.png' %}" alt="Registration Illustration" />
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="p-5 mt-auto">
+        <div class="container w-75 m-auto row p-5">
+            <div class="col-md-6">
+                <h3 class="mb-3">SmartCare</h3>
+                <p><small>Copyright © SmartCare. All Rights Reserved</small></p>
+                <h5 class="mt-4">Follow Us</h5>
+                <div class="icons">
+                    <a href="https://www.linkedin.com" target="_blank"><i class="fab fa-linkedin fa-2x"></i></a>
+                    <a href="https://www.youtube.com" target="_blank"><i class="fab fa-youtube fa-2x"></i></a>
+                    <a href="https://www.facebook.com" target="_blank"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="https://www.twitter.com" target="_blank"><i class="fab fa-twitter fa-2x"></i></a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <h5>Company</h5>
+                <ul>
+                    <li><a href="{% url 'about_page' %}">About</a></li>
+                    <li><a href="{% url 'contact_us_page' %}">Contact Us</a></li>
+                    <li><a href="{% url 'careers_page' %}">Careers</a></li>
+                    <li><a href="{% url 'blog_page' %}">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Resources</h5>
+                <ul>
+                    <li><a href="{% url 'health_tips_page' %}">Health Tips</a></li>
+                    <li><a href="{% url 'doctors_page' %}">Find a Doctor</a></li>
+                    <li><a href="{% url 'all_appointments' %}">Appointments</a></li>
+                    <li><a href="{% url 'faq_page' %}">FAQ</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr />
+        <p class="text-center mt-3">
+            <small>Copyright © SmartCare 2024. All Rights Reserved</small>
+        </p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/auth.js' %}"></script>
+    <script src="{% static 'js/docDetails.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+            crossorigin="anonymous"></script>
+
+    <script>
+        // Toggle password visibility
+        function togglePassword(fieldId) {
+            const passwordInput = document.getElementById(fieldId);
+            const toggleIcon = passwordInput.nextElementSibling;
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html>

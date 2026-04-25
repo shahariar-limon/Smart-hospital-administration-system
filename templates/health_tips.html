@@ -1,0 +1,365 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Tips - SmartCare</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+</head>
+<body>
+    <header>
+        <!-- Navigation Bar -->
+        <nav class="d-flex justify-content-around align-items-center p-4">
+            <div class="logo-container d-flex align-items-center gap-2">
+                <img src="{% static 'images/stethoscope 1.png' %}" alt="SmartCare Logo" />
+                <h3>SmartCare</h3>
+            </div>
+            <div class="menu-container d-flex gap-3 align-items-center">
+                <ul class="d-flex gap-3 list-unstyled mb-0">
+                    <li class="menu"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="menu"><a href="#services">Services</a></li>
+                    <li class="menu"><a href="#contact">Contact us</a></li>
+                    {% if not user.is_authenticated %}
+                    <li class="menu"><a href="{% url 'login' %}">Login</a></li>
+                    {% endif %}
+                </ul>
+                {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                            id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user"></i> Profile
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'user_details' %}">
+                                <i class="fas fa-user-circle"></i> My Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'all_appointments' %}">
+                                <i class="fas fa-calendar-check"></i> All Appointments
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li onclick="handlelogOut()">
+                            <a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Health Tips Section -->
+        <div class="container py-5">
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <h1 class="display-4 mb-3">Health Tips</h1>
+                    <p class="lead text-muted">Expert advice for a healthier, happier life</p>
+                </div>
+            </div>
+
+            <!-- Daily Health Tips -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="text-center mb-4">Daily Health Tips</h2>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-tint fa-3x text-info mb-3"></i>
+                            <h5 class="card-title">Stay Hydrated</h5>
+                            <p class="card-text">
+                                Drink at least 8 glasses of water daily. Proper hydration helps maintain
+                                body temperature, keeps joints lubricated, prevents infections, and
+                                delivers nutrients to cells.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-walking fa-3x text-success mb-3"></i>
+                            <h5 class="card-title">Exercise Regularly</h5>
+                            <p class="card-text">
+                                Aim for at least 30 minutes of moderate exercise daily. Regular physical
+                                activity improves cardiovascular health, strengthens bones, and boosts
+                                mental wellbeing.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-bed fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title">Get Enough Sleep</h5>
+                            <p class="card-text">
+                                Adults need 7-9 hours of quality sleep per night. Good sleep improves
+                                brain performance, mood, and overall health. Establish a consistent
+                                sleep schedule.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-apple-alt fa-3x text-danger mb-3"></i>
+                            <h5 class="card-title">Eat Balanced Meals</h5>
+                            <p class="card-text">
+                                Include fruits, vegetables, whole grains, and lean proteins in your diet.
+                                A balanced diet provides essential nutrients and helps maintain a healthy
+                                weight.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-hands-wash fa-3x text-warning mb-3"></i>
+                            <h5 class="card-title">Practice Good Hygiene</h5>
+                            <p class="card-text">
+                                Wash your hands regularly with soap and water, especially before eating
+                                and after using the bathroom. Good hygiene prevents the spread of
+                                infections.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-smile fa-3x text-info mb-3"></i>
+                            <h5 class="card-title">Manage Stress</h5>
+                            <p class="card-text">
+                                Practice relaxation techniques like meditation, deep breathing, or yoga.
+                                Managing stress improves mental health and reduces risk of various
+                                health problems.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nutrition Tips -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="text-center mb-4">Nutrition Tips</h2>
+                </div>
+                <div class="col-12">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5><i class="fas fa-check-circle text-success"></i> Eat More Fiber</h5>
+                            <p>
+                                Include whole grains, fruits, vegetables, and legumes in your diet. Fiber
+                                aids digestion, helps maintain healthy weight, and lowers risk of diabetes
+                                and heart disease.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5><i class="fas fa-check-circle text-success"></i> Limit Sugar Intake</h5>
+                            <p>
+                                Reduce consumption of sugary drinks and processed foods. Excessive sugar
+                                intake is linked to obesity, type 2 diabetes, and heart disease. Choose
+                                natural sweeteners when possible.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5><i class="fas fa-check-circle text-success"></i> Choose Healthy Fats</h5>
+                            <p>
+                                Include sources of healthy fats like nuts, seeds, avocados, and olive oil.
+                                Avoid trans fats and limit saturated fats. Healthy fats support brain
+                                health and reduce inflammation.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h5><i class="fas fa-check-circle text-success"></i> Control Portion Sizes</h5>
+                            <p>
+                                Be mindful of serving sizes to avoid overeating. Use smaller plates,
+                                eat slowly, and stop eating when you feel satisfied rather than full.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mental Health Tips -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="text-center mb-4">Mental Health Tips</h2>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5><i class="fas fa-users text-primary"></i> Stay Connected</h5>
+                            <p>
+                                Maintain strong relationships with family and friends. Social connections
+                                are vital for mental wellbeing and can help reduce stress and anxiety.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5><i class="fas fa-brain text-success"></i> Challenge Your Mind</h5>
+                            <p>
+                                Engage in activities that stimulate your brain like reading, puzzles, or
+                                learning new skills. Mental stimulation helps maintain cognitive function.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5><i class="fas fa-heart text-danger"></i> Practice Gratitude</h5>
+                            <p>
+                                Take time each day to acknowledge things you're grateful for. Gratitude
+                                practice can improve mood and overall life satisfaction.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5><i class="fas fa-sun text-warning"></i> Get Sunlight</h5>
+                            <p>
+                                Spend time outdoors in natural sunlight daily. Sunlight helps your body
+                                produce vitamin D and can improve mood and sleep quality.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preventive Care -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="card bg-primary text-white shadow">
+                        <div class="card-body p-5 text-center">
+                            <h3 class="mb-3">Remember: Prevention is Better Than Cure</h3>
+                            <p class="mb-4">
+                                Schedule regular health checkups and screenings. Early detection can
+                                make a significant difference in treatment outcomes. Don't wait until
+                                you feel sick to see a doctor.
+                            </p>
+                            <a href="{% url 'doctors_page' %}" class="btn btn-light btn-lg">
+                                <i class="fas fa-calendar-check"></i> Book Your Checkup Today
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Tips -->
+            <div class="row">
+                <div class="col-12">
+                    <h2 class="text-center mb-4">More Healthy Living Tips</h2>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6><i class="fas fa-smoking-ban text-danger"></i> Avoid Smoking</h6>
+                            <p class="small">Quit smoking to reduce risk of cancer and heart disease.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6><i class="fas fa-wine-bottle text-warning"></i> Limit Alcohol</h6>
+                            <p class="small">Drink alcohol in moderation or avoid it completely.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6><i class="fas fa-weight text-success"></i> Maintain Healthy Weight</h6>
+                            <p class="small">Keep your weight within a healthy range through diet and exercise.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6><i class="fas fa-shield-virus text-primary"></i> Get Vaccinated</h6>
+                            <p class="small">Stay up to date with recommended vaccinations and immunizations.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="p-5" id="contact">
+        <div class="container w-75 m-auto row p-5">
+            <div class="col-md-6">
+                <h3 class="mb-3">SmartCare</h3>
+                <p><small>Copyright © SmartCare. All Rights Reserved</small></p>
+                <h5 class="mt-4">Follow Us</h5>
+                <div class="icons">
+                    <a href="https://www.linkedin.com" target="_blank"><i class="fab fa-linkedin fa-2x"></i></a>
+                    <a href="https://www.youtube.com" target="_blank"><i class="fab fa-youtube fa-2x"></i></a>
+                    <a href="https://www.facebook.com" target="_blank"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="https://www.twitter.com" target="_blank"><i class="fab fa-twitter fa-2x"></i></a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <h5>Company</h5>
+                <ul>
+                    <li><a href="{% url 'about_page' %}">About</a></li>
+                    <li><a href="{% url 'contact_us_page' %}">Contact Us</a></li>
+                    <li><a href="{% url 'careers_page' %}">Careers</a></li>
+                    <li><a href="{% url 'blog_page' %}">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Resources</h5>
+                <ul>
+                    <li><a href="{% url 'health_tips_page' %}">Health Tips</a></li>
+                    <li><a href="{% url 'doctors_page' %}">Find a Doctor</a></li>
+                    <li><a href="{% url 'all_appointments' %}">Appointments</a></li>
+                    <li><a href="{% url 'faq_page' %}">FAQ</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr />
+        <p class="text-center mt-3">
+            <small>Copyright © SmartCare 2024. All Rights Reserved</small>
+        </p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+            crossorigin="anonymous"></script>
+</body>
+</html>

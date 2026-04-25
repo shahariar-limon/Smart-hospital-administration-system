@@ -1,0 +1,396 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post - SmartCare</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+</head>
+<body>
+    <header>
+        <!-- Navigation Bar -->
+        <nav class="d-flex justify-content-around align-items-center p-4">
+            <div class="logo-container d-flex align-items-center gap-2">
+                <img src="{% static 'images/stethoscope 1.png' %}" alt="SmartCare Logo" />
+                <h3>SmartCare</h3>
+            </div>
+            <div class="menu-container d-flex gap-3 align-items-center">
+                <ul class="d-flex gap-3 list-unstyled mb-0">
+                    <li class="menu"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="menu"><a href="{% url 'blog_page' %}">Blog</a></li>
+                    <li class="menu"><a href="{% url 'contact_us_page' %}">Contact us</a></li>
+                    {% if not user.is_authenticated %}
+                    <li class="menu"><a href="{% url 'login' %}">Login</a></li>
+                    {% endif %}
+                </ul>
+                {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                            id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user"></i> Profile
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'user_details' %}">
+                                <i class="fas fa-user-circle"></i> My Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'all_appointments' %}">
+                                <i class="fas fa-calendar-check"></i> All Appointments
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li onclick="handlelogOut()">
+                            <a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Blog Detail Section -->
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <a href="{% url 'blog_page' %}" class="btn btn-outline-primary mb-4">
+                        <i class="fas fa-arrow-left"></i> Back to Blog
+                    </a>
+
+                    {% if blog_id == 1 %}
+                    <article>
+                        <span class="badge bg-primary mb-2">Featured</span>
+                        <h1 class="mb-3">The Importance of Regular Health Checkups</h1>
+                        <p class="text-muted">
+                            <i class="fas fa-calendar"></i> December 1, 2024 |
+                            <i class="fas fa-user"></i> Dr. Sarah Ahmed
+                        </p>
+                        <hr>
+                        <div class="blog-content">
+                            <p>Regular health checkups are essential for maintaining good health and preventing serious illnesses. During a checkup, your doctor can detect potential health issues before they become serious problems. Early detection of diseases like diabetes, high blood pressure, and cancer can significantly improve treatment outcomes.</p>
+                            <h3>Why Regular Checkups Matter</h3>
+                            <p>Prevention is always better than cure. Regular health screenings can help identify risk factors for various diseases early on, when they are most treatable.</p>
+                            <h3>What to Expect</h3>
+                            <p>During a typical health checkup, your doctor will review your medical history, check vital signs, and may order blood tests or other screenings based on your age and risk factors.</p>
+                            <h3>Recommended Schedule</h3>
+                            <ul>
+                                <li>Adults under 50: Annual checkup</li>
+                                <li>Adults over 50: Checkup every 6 months</li>
+                                <li>Special considerations for chronic conditions</li>
+                            </ul>
+                        </div>
+                    </article>
+
+                    {% elif blog_id == 2 %}
+                    <article>
+                        <span class="badge bg-success mb-2">Nutrition</span>
+                        <h1 class="mb-3">Top 10 Superfoods for a Healthy Heart</h1>
+                        <p class="text-muted">
+                            <i class="fas fa-calendar"></i> November 28, 2024 |
+                            <i class="fas fa-user"></i> Dr. Michael Chen
+                        </p>
+                        <hr>
+                        <div class="blog-content">
+                            <p>Discover the best foods that can help maintain cardiovascular health and reduce the risk of heart disease. From omega-3 rich fish to antioxidant-packed berries, these superfoods can make a significant difference in your heart health.</p>
+                            <h3>Top 10 Heart-Healthy Foods</h3>
+                            <ol>
+                                <li>Salmon and fatty fish</li>
+                                <li>Oats and whole grains</li>
+                                <li>Berries</li>
+                                <li>Dark leafy greens</li>
+                                <li>Nuts and seeds</li>
+                                <li>Avocados</li>
+                                <li>Olive oil</li>
+                                <li>Legumes</li>
+                                <li>Tomatoes</li>
+                                <li>Dark chocolate</li>
+                            </ol>
+                            <p>Incorporating these foods into your daily diet can help lower cholesterol, reduce blood pressure, and improve overall cardiovascular health.</p>
+                        </div>
+                    </article>
+
+                    {% elif blog_id == 3 %}
+                    <article>
+                        <span class="badge bg-info mb-2">Wellness</span>
+                        <h1 class="mb-3">Managing Stress: Tips from Our Experts</h1>
+                        <p class="text-muted">
+                            <i class="fas fa-calendar"></i> November 25, 2024 |
+                            <i class="fas fa-user"></i> Dr. Lisa Rahman
+                        </p>
+                        <hr>
+                        <div class="blog-content">
+                            <p>Learn effective stress management techniques recommended by our mental health professionals. From meditation to exercise, discover what works best for you.</p>
+                            <h3>Effective Stress Management Techniques</h3>
+                            <ul>
+                                <li>Practice mindfulness meditation</li>
+                                <li>Regular physical exercise</li>
+                                <li>Adequate sleep</li>
+                                <li>Social connections</li>
+                                <li>Time management</li>
+                                <li>Professional help when needed</li>
+                            </ul>
+                            <p>Remember, managing stress is not about eliminating it entirely, but learning to cope with it in healthy ways.</p>
+                        </div>
+                    </article>
+
+                    {% elif blog_id == 4 %}
+                    <article>
+                        <span class="badge bg-warning mb-2">Prevention</span>
+                        <h1 class="mb-3">Flu Season: How to Protect Yourself</h1>
+                        <p class="text-muted">
+                            <i class="fas fa-calendar"></i> November 22, 2024 |
+                            <i class="fas fa-user"></i> Dr. John Smith
+                        </p>
+                        <hr>
+                        <div class="blog-content">
+                            <p>As flu season approaches, learn about vaccination, hygiene practices, and other preventive measures to keep yourself and your family healthy this winter.</p>
+                            <h3>Prevention Strategies</h3>
+                            <ul>
+                                <li>Get your annual flu vaccine</li>
+                                <li>Wash hands frequently</li>
+                                <li>Avoid touching your face</li>
+                                <li>Stay home when sick</li>
+                                <li>Maintain healthy habits</li>
+                            </ul>
+                            <p>The flu vaccine is the most effective way to prevent influenza and its complications.</p>
+                        </div>
+                    </article>
+
+                    {% elif blog_id == 5 %}
+                    <article>
+                        <span class="badge bg-danger mb-2">Emergency</span>
+                        <h1 class="mb-3">When to Visit the Emergency Room</h1>
+                        <p class="text-muted">
+                            <i class="fas fa-calendar"></i> November 20, 2024 |
+                            <i class="fas fa-user"></i> Dr. Emily Johnson
+                        </p>
+                        <hr>
+                        <div class="blog-content">
+                            <p>Understanding when a medical situation requires immediate emergency care can save lives. Learn about warning signs that should never be ignored.</p>
+                            <h3>Warning Signs Requiring Emergency Care</h3>
+                            <ul>
+                                <li>Chest pain or pressure</li>
+                                <li>Difficulty breathing</li>
+                                <li>Severe bleeding</li>
+                                <li>Signs of stroke</li>
+                                <li>Severe allergic reactions</li>
+                                <li>Loss of consciousness</li>
+                            </ul>
+                            <p>When in doubt, it's always better to seek emergency care. Our emergency department is open 24/7.</p>
+                        </div>
+                    </article>
+
+                    {% elif blog_id == 6 %}
+                    <article>
+                        <span class="badge bg-primary mb-2">Pediatrics</span>
+                        <h1 class="mb-3">Child Vaccination Schedule Guide</h1>
+                        <p class="text-muted">
+                            <i class="fas fa-calendar"></i> November 18, 2024 |
+                            <i class="fas fa-user"></i> Dr. Maria Garcia
+                        </p>
+                        <hr>
+                        <div class="blog-content">
+                            <p>A comprehensive guide to childhood vaccinations, explaining which vaccines your child needs and when. Keep your little ones protected with proper immunization.</p>
+                            <h3>Essential Childhood Vaccines</h3>
+                            <p>Vaccines protect children from serious diseases. Following the recommended schedule ensures maximum protection.</p>
+                            <ul>
+                                <li>Birth: Hepatitis B</li>
+                                <li>2 months: DTaP, Polio, Hib, PCV</li>
+                                <li>6 months: Influenza (yearly)</li>
+                                <li>12 months: MMR, Varicella</li>
+                                <li>4-6 years: Boosters</li>
+                            </ul>
+                        </div>
+                    </article>
+
+                    {% elif blog_id == 7 %}
+                    <article>
+                        <span class="badge bg-success mb-2">Fitness</span>
+                        <h1 class="mb-3">Exercise Tips for a Healthier Lifestyle</h1>
+                        <p class="text-muted">
+                            <i class="fas fa-calendar"></i> November 15, 2024 |
+                            <i class="fas fa-user"></i> Dr. David Lee
+                        </p>
+                        <hr>
+                        <div class="blog-content">
+                            <p>Regular physical activity is crucial for maintaining good health. Our fitness experts share practical tips to help you start and maintain an exercise routine.</p>
+                            <h3>Getting Started</h3>
+                            <ul>
+                                <li>Start slowly and gradually increase intensity</li>
+                                <li>Find activities you enjoy</li>
+                                <li>Set realistic goals</li>
+                                <li>Make it a habit</li>
+                                <li>Stay consistent</li>
+                            </ul>
+                            <p>Aim for at least 150 minutes of moderate aerobic activity or 75 minutes of vigorous activity per week.</p>
+                        </div>
+                    </article>
+
+                    {% elif blog_id == 8 %}
+                    <article>
+                        <span class="badge bg-info mb-2">Mental Health</span>
+                        <h1 class="mb-3">Understanding Depression and Anxiety</h1>
+                        <p class="text-muted">
+                            <i class="fas fa-calendar"></i> November 12, 2024 |
+                            <i class="fas fa-user"></i> Dr. Rebecca Taylor
+                        </p>
+                        <hr>
+                        <div class="blog-content">
+                            <p>Mental health is just as important as physical health. Learn about common mental health conditions, their symptoms, and available treatment options.</p>
+                            <h3>Common Symptoms</h3>
+                            <p>Depression and anxiety can manifest in various ways. Common symptoms include:</p>
+                            <ul>
+                                <li>Persistent sadness or worry</li>
+                                <li>Changes in sleep patterns</li>
+                                <li>Loss of interest in activities</li>
+                                <li>Difficulty concentrating</li>
+                                <li>Physical symptoms like headaches</li>
+                            </ul>
+                            <p>If you're experiencing these symptoms, please reach out to a mental health professional.</p>
+                        </div>
+                    </article>
+
+                    {% elif blog_id == 9 %}
+                    <article>
+                        <span class="badge bg-warning mb-2">Diabetes</span>
+                        <h1 class="mb-3">Living Well with Diabetes</h1>
+                        <p class="text-muted">
+                            <i class="fas fa-calendar"></i> November 10, 2024 |
+                            <i class="fas fa-user"></i> Dr. Ahmed Hassan
+                        </p>
+                        <hr>
+                        <div class="blog-content">
+                            <p>Managing diabetes doesn't mean giving up on quality of life. Discover practical tips for diet, exercise, and medication management to keep your blood sugar in check.</p>
+                            <h3>Key Management Strategies</h3>
+                            <ul>
+                                <li>Monitor blood sugar regularly</li>
+                                <li>Follow a balanced diet</li>
+                                <li>Exercise regularly</li>
+                                <li>Take medications as prescribed</li>
+                                <li>Attend regular checkups</li>
+                            </ul>
+                            <p>With proper management, people with diabetes can live full, healthy lives.</p>
+                        </div>
+                    </article>
+
+                    {% elif blog_id == 10 %}
+                    <article>
+                        <span class="badge bg-danger mb-2">Women's Health</span>
+                        <h1 class="mb-3">Prenatal Care: What to Expect</h1>
+                        <p class="text-muted">
+                            <i class="fas fa-calendar"></i> November 8, 2024 |
+                            <i class="fas fa-user"></i> Dr. Sophia Anderson
+                        </p>
+                        <hr>
+                        <div class="blog-content">
+                            <p>Pregnancy is an exciting journey. Learn about the importance of prenatal care, necessary tests, and how to ensure a healthy pregnancy for both mother and baby.</p>
+                            <h3>Important Prenatal Tests</h3>
+                            <ul>
+                                <li>Blood tests and screening</li>
+                                <li>Ultrasounds</li>
+                                <li>Glucose screening</li>
+                                <li>Genetic testing (if needed)</li>
+                                <li>Group B strep test</li>
+                            </ul>
+                            <p>Regular prenatal visits help ensure a healthy pregnancy and identify any potential issues early.</p>
+                        </div>
+                    </article>
+
+                    {% else %}
+                    <article>
+                        <h1 class="mb-3">Blog Post Not Found</h1>
+                        <p>Sorry, the blog post you're looking for doesn't exist.</p>
+                        <a href="{% url 'blog_page' %}" class="btn btn-primary">Return to Blog</a>
+                    </article>
+                    {% endif %}
+
+                    <!-- Related Posts -->
+                    <div class="mt-5">
+                        <h3>Related Articles</h3>
+                        <div class="row mt-4">
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5>More Health Tips</h5>
+                                        <p class="text-muted">Explore our health tips section for more advice.</p>
+                                        <a href="{% url 'health_tips_page' %}" class="btn btn-sm btn-primary">Read More</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5>All Blog Posts</h5>
+                                        <p class="text-muted">Browse all our blog articles.</p>
+                                        <a href="{% url 'blog_page' %}" class="btn btn-sm btn-primary">View All</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="p-5" id="contact">
+        <div class="container w-75 m-auto row p-5">
+            <div class="col-md-6">
+                <h3 class="mb-3">SmartCare</h3>
+                <p><small>Copyright © SmartCare. All Rights Reserved</small></p>
+                <h5 class="mt-4">Follow Us</h5>
+                <div class="icons">
+                    <a href="https://www.linkedin.com" target="_blank"><i class="fab fa-linkedin fa-2x"></i></a>
+                    <a href="https://www.youtube.com" target="_blank"><i class="fab fa-youtube fa-2x"></i></a>
+                    <a href="https://www.facebook.com" target="_blank"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="https://www.twitter.com" target="_blank"><i class="fab fa-twitter fa-2x"></i></a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <h5>Company</h5>
+                <ul>
+                    <li><a href="{% url 'about_page' %}">About</a></li>
+                    <li><a href="{% url 'contact_us_page' %}">Contact Us</a></li>
+                    <li><a href="{% url 'careers_page' %}">Careers</a></li>
+                    <li><a href="{% url 'blog_page' %}">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Resources</h5>
+                <ul>
+                    <li><a href="{% url 'health_tips_page' %}">Health Tips</a></li>
+                    <li><a href="{% url 'doctors_page' %}">Find a Doctor</a></li>
+                    <li><a href="{% url 'all_appointments' %}">Appointments</a></li>
+                    <li><a href="{% url 'faq_page' %}">FAQ</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr />
+        <p class="text-center mt-3">
+            <small>Copyright © SmartCare 2024. All Rights Reserved</small>
+        </p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+            crossorigin="anonymous"></script>
+</body>
+</html>

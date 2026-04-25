@@ -1,0 +1,241 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Our Services - SmartCare</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+</head>
+<body>
+    <header>
+        <!-- Navigation Bar -->
+        <nav class="d-flex justify-content-around align-items-center p-4">
+            <div class="logo-container d-flex align-items-center gap-2">
+                <img src="{% static 'images/stethoscope 1.png' %}" alt="SmartCare Logo" />
+                <h3>SmartCare</h3>
+            </div>
+            <div class="menu-container d-flex gap-3 align-items-center">
+                <ul class="d-flex gap-3 list-unstyled mb-0">
+                    <li class="menu"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="menu"><a href="{% url 'services_page' %}">Services</a></li>
+                    <li class="menu"><a href="{% url 'contact_us_page' %}">Contact us</a></li>
+                    {% if not user.is_authenticated %}
+                    <li class="menu"><a href="{% url 'login' %}">Login</a></li>
+                    {% endif %}
+                </ul>
+                {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                            id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user"></i> Profile
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'user_details' %}">
+                                <i class="fas fa-user-circle"></i> My Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'all_appointments' %}">
+                                <i class="fas fa-calendar-check"></i> My Appointments
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <!-- Services Hero Section -->
+    <section class="services-hero py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold mb-3">Our Healthcare Services</h1>
+            <p class="lead">Comprehensive medical care tailored to your needs</p>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services-section py-5">
+        <div class="container">
+            <div class="row">
+                {% if services %}
+                    {% for service in services %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm border-0 service-card">
+                            {% if service.image %}
+                            <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}" style="height: 250px; object-fit: cover;">
+                            {% else %}
+                            <div class="card-img-top bg-primary d-flex align-items-center justify-content-center" style="height: 250px;">
+                                <i class="fas fa-hospital-alt fa-5x text-white"></i>
+                            </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title text-primary fw-bold">{{ service.name }}</h5>
+                                <p class="card-text text-muted">{{ service.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <!-- Default Services when no database entries exist -->
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm border-0 service-card">
+                            <div class="card-img-top bg-primary d-flex align-items-center justify-content-center" style="height: 250px;">
+                                <i class="fas fa-user-md fa-5x text-white"></i>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-primary fw-bold">General Medicine</h5>
+                                <p class="card-text text-muted">Comprehensive primary care services for all ages with experienced physicians.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm border-0 service-card">
+                            <div class="card-img-top bg-success d-flex align-items-center justify-content-center" style="height: 250px;">
+                                <i class="fas fa-heartbeat fa-5x text-white"></i>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-success fw-bold">Cardiology</h5>
+                                <p class="card-text text-muted">Advanced heart care with state-of-the-art diagnostic and treatment facilities.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm border-0 service-card">
+                            <div class="card-img-top bg-info d-flex align-items-center justify-content-center" style="height: 250px;">
+                                <i class="fas fa-x-ray fa-5x text-white"></i>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-info fw-bold">Radiology</h5>
+                                <p class="card-text text-muted">Advanced imaging services including X-ray, CT scan, and MRI.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm border-0 service-card">
+                            <div class="card-img-top bg-warning d-flex align-items-center justify-content-center" style="height: 250px;">
+                                <i class="fas fa-vials fa-5x text-white"></i>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-warning fw-bold">Laboratory Services</h5>
+                                <p class="card-text text-muted">Comprehensive diagnostic testing with quick and accurate results.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm border-0 service-card">
+                            <div class="card-img-top bg-danger d-flex align-items-center justify-content-center" style="height: 250px;">
+                                <i class="fas fa-ambulance fa-5x text-white"></i>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-danger fw-bold">Emergency Services</h5>
+                                <p class="card-text text-muted">24/7 emergency care with immediate medical attention.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm border-0 service-card">
+                            <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 250px;">
+                                <i class="fas fa-procedures fa-5x text-white"></i>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-secondary fw-bold">Surgery</h5>
+                                <p class="card-text text-muted">Expert surgical care with modern operation theaters and skilled surgeons.</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta-section py-5 bg-light">
+        <div class="container text-center">
+            <h2 class="mb-4">Ready to Book an Appointment?</h2>
+            <p class="lead mb-4">Our medical professionals are here to help you with the best care possible.</p>
+            <a href="{% url 'doctors_page' %}" class="btn btn-primary btn-lg me-2">
+                <i class="fas fa-user-md"></i> View Our Doctors
+            </a>
+            <a href="{% url 'contact_us_page' %}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-envelope"></i> Contact Us
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5>SmartCare</h5>
+                    <p>Quality Healthcare Services</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'home' %}" class="text-white-50 text-decoration-none">Home</a></li>
+                        <li><a href="{% url 'services_page' %}" class="text-white-50 text-decoration-none">Services</a></li>
+                        <li><a href="{% url 'doctors_page' %}" class="text-white-50 text-decoration-none">Doctors</a></li>
+                        <li><a href="{% url 'contact_us_page' %}" class="text-white-50 text-decoration-none">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Follow Us</h5>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="#" class="text-white-50"><i class="fab fa-facebook fa-2x"></i></a>
+                        <a href="#" class="text-white-50"><i class="fab fa-twitter fa-2x"></i></a>
+                        <a href="#" class="text-white-50"><i class="fab fa-instagram fa-2x"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="bg-white" />
+            <p class="mb-0">&copy; 2025 SmartCare. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+
+    <style>
+        .service-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .services-hero {
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</body>
+</html>

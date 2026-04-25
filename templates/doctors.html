@@ -1,0 +1,1282 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find Doctors - SmartCare</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    
+    <style>
+        /* Enhanced Doctor Card Styles */
+        .doctor-card {
+            border: none;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(28, 168, 199, 0.2) !important;
+        }
+
+        .doctor-img-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .doctor-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border: 4px solid #1CA8C7;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .doctor-card:hover .doctor-img {
+            transform: scale(1.05);
+            border-color: #439FA5;
+            box-shadow: 0 8px 20px rgba(28, 168, 199, 0.3);
+        }
+
+        .availability-badge {
+            position: absolute;
+            bottom: 5px;
+            right: -5px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid white;
+            font-size: 14px;
+        }
+
+        .availability-badge.available {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .availability-badge.busy {
+            background-color: #ffc107;
+            color: white;
+        }
+
+        .doctor-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .doctor-designation {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .specializations {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            justify-content: center;
+        }
+
+        .specializations .badge {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.7rem;
+            font-weight: 500;
+        }
+
+        .bg-pink {
+            background-color: #e83e8c !important;
+        }
+
+        .bg-purple {
+            background-color: #6f42c1 !important;
+        }
+
+        .bg-teal {
+            background-color: #20c997 !important;
+        }
+
+        .doctor-info {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .doctor-info i {
+            margin-right: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1CA8C7, #439FA5);
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #439FA5, #1CA8C7);
+            transform: scale(1.02);
+        }
+
+        /* Responsive Grid */
+        @media (max-width: 768px) {
+            .doctor-card {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Loading and No Data States */
+        #spinner, #nodata {
+            display: none;
+        }
+
+        #spinner.active, #nodata.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <!-- Navigation Bar -->
+        <nav class="d-flex justify-content-around align-items-center p-4">
+            <div class="logo-container d-flex align-items-center gap-2">
+                <img src="{% static 'images/stethoscope 1.png' %}" alt="SmartCare Logo" />
+                <h3>SmartCare</h3>
+            </div>
+            <div class="menu-container d-flex gap-3 align-items-center">
+                <ul class="d-flex gap-3 list-unstyled mb-0">
+                    <li class="menu"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="menu"><a href="{% url 'home' %}#services">Services</a></li>
+                    <li class="menu"><a href="{% url 'home' %}#contact">Contact us</a></li>
+                    <li class="menu"><a href="{% url 'login' %}">Login</a></li>
+                </ul>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                            id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user"></i> Profile
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'user_details' %}">
+                                <i class="fas fa-user-circle"></i> My Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'all_appointments' %}">
+                                <i class="fas fa-calendar-check"></i> All Appointments
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li onclick="handlelogOut()">
+                            <a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container my-5">
+        <!-- Page Title -->
+        <div class="text-center mb-5">
+            <h1 class="title">Find Our Doctors</h1>
+            <p class="description">
+                Browse our team of experienced and qualified medical professionals
+            </p>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="input-group shadow-sm">
+                    <input id="search" type="text" class="form-control form-control-lg"
+                           placeholder="Search doctors by name or specialty..."
+                           aria-label="Search doctors" />
+                    <button class="btn btn-lg" onclick="handleSearch()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4 justify-content-center">
+            <div class="col-auto">
+                <div class="dropdown">
+                    <button class="btn btn-info dropdown-toggle" type="button"
+                            id="designationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-md"></i> Designation
+                    </button>
+                    <ul id="drop-deg" class="dropdown-menu" aria-labelledby="designationDropdown">
+                        <li><a class="dropdown-item" href="#" onclick="loadDoctors(''); return false;">All Designations</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="loadDoctors('Professor'); return false;">Professor</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="loadDoctors('Assistant Professor'); return false;">Assistant Professor</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="loadDoctors('Consultant'); return false;">Consultant</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="loadDoctors('Specialist'); return false;">Specialist</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="dropdown">
+                    <button class="btn btn-info dropdown-toggle" type="button"
+                            id="specializationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-stethoscope"></i> Specialization
+                    </button>
+                    <ul id="drop-spe" class="dropdown-menu" aria-labelledby="specializationDropdown">
+                        <li><a class="dropdown-item" href="#" onclick="loadDoctors(''); return false;">All Specializations</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="loadDoctors('Cardiology'); return false;">Cardiology</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="loadDoctors('Neurology'); return false;">Neurology</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="loadDoctors('Orthopedics'); return false;">Orthopedics</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="loadDoctors('Pediatrics'); return false;">Pediatrics</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="loadDoctors('General Surgery'); return false;">General Surgery</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="loadDoctors('Dermatology'); return false;">Dermatology</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="loadDoctors('Gynecology'); return false;">Gynecology</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="loadDoctors('Oncology'); return false;">Oncology</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctors Grid -->
+        <div id="doctors" class="row g-4">
+            <!-- Loading State -->
+            <div id="spinner" class="loading text-center col-12">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h4 class="mt-3">Loading doctors...</h4>
+            </div>
+
+            <!-- No Data State -->
+            <div id="nodata" class="nodata col-12">
+                <img src="{% static 'images/nodata.png' %}" alt="No data found" />
+                <p class="mt-3 text-muted">No doctors found matching your criteria</p>
+            </div>
+
+            <!-- Sample Doctor Cards (will be replaced by dynamic content) -->
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" 
+                                 alt="Dr. John Smith" 
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. John Smith</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Senior Consultant
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-primary mb-1">Cardiology</span>
+                            <span class="badge bg-info mb-1">Internal Medicine</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, MD</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 15 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" 
+                                 alt="Dr. Sarah Johnson" 
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Sarah Johnson</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Consultant
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-success mb-1">Neurology</span>
+                            <span class="badge bg-warning mb-1">Neuropsychiatry</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, DM</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 12 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/men/67.jpg" 
+                                 alt="Dr. Michael Chen" 
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge busy">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Michael Chen</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Specialist
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-danger mb-1">Orthopedics</span>
+                            <span class="badge bg-secondary mb-1">Sports Medicine</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, MS</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 10 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/women/68.jpg" 
+                                 alt="Dr. Emily Rodriguez" 
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Emily Rodriguez</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Senior Specialist
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-pink mb-1">Pediatrics</span>
+                            <span class="badge bg-info mb-1">Child Health</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, DCH</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 18 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/men/45.jpg" 
+                                 alt="Dr. Ahmed Hassan" 
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Ahmed Hassan</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Consultant
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-purple mb-1">General Surgery</span>
+                            <span class="badge bg-info mb-1">Laparoscopy</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, FCPS</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 14 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/women/29.jpg" 
+                                 alt="Dr. Lisa Anderson" 
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Lisa Anderson</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Specialist
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-teal mb-1">Dermatology</span>
+                            <span class="badge bg-warning mb-1">Cosmetology</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, MD</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 8 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/men/52.jpg" 
+                                 alt="Dr. Robert Taylor" 
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge busy">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Robert Taylor</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Senior Consultant
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-dark mb-1">Oncology</span>
+                            <span class="badge bg-danger mb-1">Cancer Treatment</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, DM</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 20 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/women/65.jpg" 
+                                 alt="Dr. Priya Sharma" 
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Priya Sharma</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Consultant
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-pink mb-1">Gynecology</span>
+                            <span class="badge bg-purple mb-1">Obstetrics</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, MS</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 11 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/men/75.jpg" 
+                                 alt="Dr. David Wilson" 
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. David Wilson</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Senior Consultant
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-success mb-1">ENT</span>
+                            <span class="badge bg-info mb-1">Head & Neck Surgery</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, MS (ENT)</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 16 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/women/90.jpg" 
+                                 alt="Dr. Maria Garcia" 
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Maria Garcia</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Specialist
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-danger mb-1">Emergency Medicine</span>
+                            <span class="badge bg-warning mb-1">Critical Care</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, FCPS</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 9 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/men/85.jpg" 
+                                 alt="Dr. James Brown" 
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge busy">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. James Brown</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Professor
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-primary mb-1">Psychiatry</span>
+                            <span class="badge bg-info mb-1">Mental Health</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, MD, PhD</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 22 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/women/72.jpg" 
+                                 alt="Dr. Fatima Khan" 
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Fatima Khan</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Assistant Professor
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-success mb-1">Endocrinology</span>
+                            <span class="badge bg-warning mb-1">Diabetes Care</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, FCPS</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 13 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/men/61.jpg" 
+                                 alt="Dr. William Lee" 
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. William Lee</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Consultant
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-purple mb-1">Urology</span>
+                            <span class="badge bg-info mb-1">Kidney Care</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, MS (Urology)</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 10 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/women/81.jpg" 
+                                 alt="Dr. Jennifer Davis" 
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge busy">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Jennifer Davis</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Senior Specialist
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-danger mb-1">Rheumatology</span>
+                            <span class="badge bg-secondary mb-1">Arthritis Care</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, MD</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 17 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/men/58.jpg" 
+                                 alt="Dr. Omar Hassan" 
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Omar Hassan</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Specialist
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-teal mb-1">Gastroenterology</span>
+                            <span class="badge bg-warning mb-1">Liver Care</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, FCPS</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 12 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/women/55.jpg"
+                                 alt="Dr. Rachel Thompson"
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Rachel Thompson</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Consultant
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-pink mb-1">Ophthalmology</span>
+                            <span class="badge bg-info mb-1">Eye Care</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, MS (Ophth)</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 14 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/men/42.jpg"
+                                 alt="Dr. Hassan Rahman"
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Hassan Rahman</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Professor
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-primary mb-1">Cardiology</span>
+                            <span class="badge bg-danger mb-1">Interventional Cardiology</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, MD, FACC</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 25 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/women/25.jpg"
+                                 alt="Dr. Ayesha Begum"
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge busy">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Ayesha Begum</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Senior Consultant
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-pink mb-1">Obstetrics</span>
+                            <span class="badge bg-purple mb-1">Maternal Care</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, FCPS, MCPS</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 19 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/men/33.jpg"
+                                 alt="Dr. Karim Ahmed"
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Karim Ahmed</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Assistant Professor
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-success mb-1">Pulmonology</span>
+                            <span class="badge bg-info mb-1">Respiratory Care</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, MD (Chest)</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 11 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/women/47.jpg"
+                                 alt="Dr. Nusrat Jahan"
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Nusrat Jahan</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Specialist
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-warning mb-1">Nephrology</span>
+                            <span class="badge bg-secondary mb-1">Dialysis</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, FCPS</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 9 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/men/71.jpg"
+                                 alt="Dr. Rahim Uddin"
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge busy">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Rahim Uddin</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Senior Specialist
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-danger mb-1">Hematology</span>
+                            <span class="badge bg-primary mb-1">Blood Disorders</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, MD, PhD</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 21 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/women/38.jpg"
+                                 alt="Dr. Shabnam Hossain"
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Shabnam Hossain</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Consultant
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-teal mb-1">Allergy & Immunology</span>
+                            <span class="badge bg-info mb-1">Asthma Care</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, MD</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 10 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/men/39.jpg"
+                                 alt="Dr. Tariq Mahmud"
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Tariq Mahmud</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Specialist
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-purple mb-1">Plastic Surgery</span>
+                            <span class="badge bg-warning mb-1">Reconstructive Surgery</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, FCPS, FRCS</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 15 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/women/62.jpg"
+                                 alt="Dr. Farzana Islam"
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge busy">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Farzana Islam</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Assistant Professor
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-success mb-1">Radiology</span>
+                            <span class="badge bg-primary mb-1">Medical Imaging</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, FCPS (Radiology)</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 12 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/men/28.jpg"
+                                 alt="Dr. Imran Chowdhury"
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Imran Chowdhury</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Senior Consultant
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-info mb-1">Infectious Diseases</span>
+                            <span class="badge bg-danger mb-1">Tropical Medicine</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, MD, DTM</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 18 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-4 col-sm-6 doctor-card-item">
+                <div class="card doctor-card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="doctor-img-wrapper mb-3">
+                            <img src="https://randomuser.me/api/portraits/women/35.jpg"
+                                 alt="Dr. Sadia Rahman"
+                                 class="doctor-img rounded-circle">
+                            <div class="availability-badge available">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <h5 class="doctor-name mb-2">Dr. Sadia Rahman</h5>
+                        <p class="doctor-designation text-muted mb-2">
+                            <i class="fas fa-user-md"></i> Professor
+                        </p>
+                        <div class="specializations mb-3">
+                            <span class="badge bg-primary mb-1">Neurosurgery</span>
+                            <span class="badge bg-danger mb-1">Brain & Spine Surgery</span>
+                        </div>
+                        <div class="doctor-info mb-3">
+                            <p class="mb-1"><i class="fas fa-graduation-cap text-primary"></i> MBBS, FCPS, FRCS</p>
+                            <p class="mb-1"><i class="fas fa-star text-warning"></i> 23 years experience</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='{% url 'doc_details' %}'">
+                            <i class="fas fa-calendar-check"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="p-5 mt-5" id="contact">
+        <div class="container w-75 m-auto row p-5">
+            <div class="col-md-6">
+                <h3 class="mb-3">SmartCare</h3>
+                <p><small>Copyright © SmartCare. All Rights Reserved</small></p>
+                <h5 class="mt-4">Follow Us</h5>
+                <div class="icons">
+                    <a href="https://www.linkedin.com" target="_blank"><i class="fab fa-linkedin fa-2x"></i></a>
+                    <a href="https://www.youtube.com" target="_blank"><i class="fab fa-youtube fa-2x"></i></a>
+                    <a href="https://www.facebook.com" target="_blank"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="https://www.twitter.com" target="_blank"><i class="fab fa-twitter fa-2x"></i></a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <h5>Company</h5>
+                <ul>
+                    <li><a href="{% url 'about_page' %}">About</a></li>
+                    <li><a href="{% url 'contact_us_page' %}">Contact Us</a></li>
+                    <li><a href="{% url 'careers_page' %}">Careers</a></li>
+                    <li><a href="{% url 'blog_page' %}">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Resources</h5>
+                <ul>
+                    <li><a href="{% url 'health_tips_page' %}">Health Tips</a></li>
+                    <li><a href="{% url 'doctors_page' %}">Find a Doctor</a></li>
+                    <li><a href="{% url 'all_appointments' %}">Appointments</a></li>
+                    <li><a href="{% url 'faq_page' %}">FAQ</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr />
+        <p class="text-center mt-3">
+            <small>Copyright © SmartCare 2024. All Rights Reserved</small>
+        </p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+            crossorigin="anonymous"></script>
+    
+    <script>
+        const BASE_URL = "http://127.0.0.1:8000";
+
+        // Load doctors from API
+        const loadDoctorsFromAPI = () => {
+            const spinner = document.getElementById("spinner");
+            const nodata = document.getElementById("nodata");
+            const doctorsContainer = document.getElementById("doctors");
+
+            // Show spinner
+            if (spinner) spinner.classList.add("active");
+
+            // Hide existing static cards
+            const staticCards = document.querySelectorAll('.doctor-card-item');
+            staticCards.forEach(card => card.style.display = 'none');
+
+            fetch(`${BASE_URL}/doctor/list/`)
+                .then(res => res.json())
+                .then(data => {
+                    console.log("Doctors loaded:", data);
+
+                    if (spinner) spinner.classList.remove("active");
+
+                    // Check if data has results (paginated) or is array
+                    const doctors = data.results || data;
+
+                    if (!Array.isArray(doctors) || doctors.length === 0) {
+                        if (nodata) nodata.classList.add("active");
+                        return;
+                    }
+
+                    // Clear static cards
+                    staticCards.forEach(card => card.remove());
+
+                    // Create dynamic cards
+                    doctors.forEach(doctor => {
+                        const col = document.createElement('div');
+                        col.className = 'col-lg-3 col-md-4 col-sm-6 doctor-card-item';
+
+                        const specializations = Array.isArray(doctor.specialization)
+                            ? doctor.specialization.map((spec, idx) => {
+                                const colors = ['primary', 'success', 'danger', 'warning', 'info', 'pink', 'purple', 'teal'];
+                                return `<span class="badge bg-${colors[idx % colors.length]} mb-1">${spec}</span>`;
+                              }).join('')
+                            : '<span class="badge bg-primary mb-1">General</span>';
+
+                        const designation = Array.isArray(doctor.designation) && doctor.designation.length > 0
+                            ? doctor.designation[0]
+                            : 'Doctor';
+
+                        col.innerHTML = `
+                            <div class="card doctor-card h-100 shadow-sm">
+                                <div class="card-body text-center">
+                                    <div class="doctor-img-wrapper mb-3">
+                                        <img src="${doctor.image || 'https://via.placeholder.com/120?text=Doctor'}"
+                                             alt="${doctor.full_name}"
+                                             class="doctor-img rounded-circle"
+                                             onerror="this.src='https://via.placeholder.com/120?text=Doctor'">
+                                        <div class="availability-badge available">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    </div>
+                                    <h5 class="doctor-name mb-2">${doctor.full_name || 'Doctor'}</h5>
+                                    <p class="doctor-designation text-muted mb-2">
+                                        <i class="fas fa-user-md"></i> ${designation}
+                                    </p>
+                                    <div class="specializations mb-3">
+                                        ${specializations}
+                                    </div>
+                                    <div class="doctor-info mb-3">
+                                        <p class="mb-1"><i class="fas fa-dollar-sign text-primary"></i> Fee: ${doctor.fee || 'N/A'} BDT</p>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm w-100" onclick="window.location.href='/docDetails.html?doctorId=${doctor.id}'">
+                                        <i class="fas fa-calendar-check"></i> View Details
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+
+                        doctorsContainer.appendChild(col);
+                    });
+                })
+                .catch(err => {
+                    console.error("Error loading doctors:", err);
+                    if (spinner) spinner.classList.remove("active");
+                    if (nodata) nodata.classList.add("active");
+                });
+        };
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Page loaded, initializing doctors page...");
+            // Show static doctor cards instead of loading from API
+            const spinner = document.getElementById("spinner");
+            const nodata = document.getElementById("nodata");
+            if (spinner) spinner.classList.remove("active");
+            if (nodata) nodata.classList.remove("active");
+
+            // Optional: Uncomment below to load from API instead of showing static cards
+            // loadDoctorsFromAPI();
+        });
+        
+        // Define handleSearch function for dynamically loaded doctors
+        const handleSearch = () => {
+            const value = document.getElementById("search").value.toLowerCase();
+            console.log("Searching for:", value);
+
+            const doctorCards = document.querySelectorAll('.doctor-card-item');
+            let visibleCount = 0;
+
+            doctorCards.forEach(card => {
+                const doctorName = card.querySelector('.doctor-name')?.textContent.toLowerCase() || '';
+                const specializations = Array.from(card.querySelectorAll('.badge')).map(b => b.textContent.toLowerCase()).join(' ');
+                const designation = card.querySelector('.doctor-designation')?.textContent.toLowerCase() || '';
+
+                if (doctorName.includes(value) || specializations.includes(value) || designation.includes(value) || value === '') {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Show/hide no data message
+            const nodata = document.getElementById("nodata");
+            if (visibleCount === 0 && nodata) {
+                nodata.classList.add('active');
+            } else if (nodata) {
+                nodata.classList.remove('active');
+            }
+
+            console.log("Visible doctors:", visibleCount);
+        };
+
+        // Add Enter key support for search
+        const searchInput = document.getElementById("search");
+        if (searchInput) {
+            searchInput.addEventListener("keypress", function(event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    handleSearch();
+                }
+            });
+        }
+
+        // Filter function for dropdowns
+        const loadDoctors = (searchTerm) => {
+            console.log("Filtering doctors by:", searchTerm);
+
+            const doctorCards = document.querySelectorAll('.doctor-card-item');
+            let visibleCount = 0;
+            const search = searchTerm.toLowerCase();
+
+            doctorCards.forEach(card => {
+                const specializations = Array.from(card.querySelectorAll('.badge')).map(b => b.textContent.toLowerCase()).join(' ');
+                const designation = card.querySelector('.doctor-designation')?.textContent.toLowerCase() || '';
+
+                if (search === '' || specializations.includes(search) || designation.includes(search)) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Show/hide no data message
+            const nodata = document.getElementById("nodata");
+            if (visibleCount === 0 && nodata) {
+                nodata.classList.add('active');
+            } else if (nodata) {
+                nodata.classList.remove('active');
+            }
+
+            console.log("Visible doctors after filter:", visibleCount);
+        };
+    </script>
+    
+    <script src="{% static 'js/logout.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,423 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartCare - Quality Healthcare Services</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+
+    <!-- Swiffy Slider -->
+    <link href="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/css/swiffy-slider.min.css" rel="stylesheet" crossorigin="anonymous" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+</head>
+<body>
+    <header>
+        <!-- Navigation Bar -->
+        <nav class="d-flex justify-content-around align-items-center p-4">
+            <div class="logo-container d-flex align-items-center gap-2">
+                <img src="{% static 'images/stethoscope 1.png' %}" alt="SmartCare Logo" />
+                <h3>SmartCare</h3>
+            </div>
+            <div class="menu-container d-flex gap-3 align-items-center">
+                <ul class="d-flex gap-3 list-unstyled mb-0">
+                    <li class="menu"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="menu"><a href="{% url 'services_page' %}">Services</a></li>
+                    <li class="menu"><a href="{% url 'contact_us_page' %}">Contact us</a></li>
+                    {% if not user.is_authenticated %}
+                    <li class="menu"><a href="{% url 'login' %}">Login</a></li>
+                    {% endif %}
+                </ul>
+                {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                            id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user"></i> Profile
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'user_details' %}">
+                                <i class="fas fa-user-circle"></i> My Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'all_appointments' %}">
+                                <i class="fas fa-calendar-check"></i> All Appointments
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li onclick="handlelogOut()">
+                            <a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+
+        <!-- Banner Section with Carousel -->
+        <div class="banner-container">
+            <div class="banner-carousel-wrapper">
+                <!-- Banner Slide 1 - Main Healthcare -->
+                <div class="banner active">
+                    <div class="banner-left">
+                        <h1>Providing Quality<br />Healthcare</h1>
+                        <p class="w-75 m-auto">
+                            Experience exceptional medical care with our team of dedicated healthcare
+                            professionals. We're committed to your health and wellbeing with modern
+                            facilities and comprehensive medical services.
+                        </p>
+                    </div>
+                    <div class="banner-img">
+                        <img class="bn-img" src="{% static 'images/doc.png' %}" alt="Doctor" />
+                    </div>
+                </div>
+
+                <!-- Banner Slide 3 - Cardiology Services -->
+                <div class="banner" data-specialty="cardiology">
+                    <div class="banner-left">
+                        <h1>Expert Cardiology<br />Care</h1>
+                        <p class="w-75 m-auto">
+                            Advanced heart care with experienced cardiologists, state-of-the-art ECG,
+                            echocardiography, and cardiac monitoring. Your heart health is our priority
+                            with comprehensive cardiovascular treatment.
+                        </p>
+                    </div>
+                    <div class="banner-img">
+                        <img class="bn-img" src="https://img.freepik.com/free-photo/beautiful-young-female-doctor-looking-camera-office_1301-7807.jpg" alt="Cardiology Specialist" onerror="this.src='{% static 'images/doc.png' %}'" />
+                    </div>
+                </div>
+
+                <!-- Banner Slide 4 - Pediatric Care -->
+                <div class="banner" data-specialty="pediatrics">
+                    <div class="banner-left">
+                        <h1>Caring for Your<br />Little Ones</h1>
+                        <p class="w-75 m-auto">
+                            Specialized pediatric healthcare for infants, children, and adolescents.
+                            Our child-friendly environment and experienced pediatricians ensure the
+                            best care with growth monitoring and vaccination programs.
+                        </p>
+                    </div>
+                    <div class="banner-img">
+                        <img class="bn-img" src="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg" alt="Pediatric Specialist" onerror="this.src='{% static 'images/doc.png' %}'" />
+                    </div>
+                </div>
+
+                <!-- Banner Slide 5 - Surgery & OT -->
+                <div class="banner" data-specialty="surgery">
+                    <div class="banner-left">
+                        <h1>Advanced Surgical<br />Excellence</h1>
+                        <p class="w-75 m-auto">
+                            Modern operation theaters with cutting-edge technology. Our skilled surgeons
+                            specialize in general surgery, laparoscopic procedures, and minimally invasive
+                            techniques for faster recovery.
+                        </p>
+                    </div>
+                    <div class="banner-img">
+                        <img class="bn-img" src="https://img.freepik.com/free-photo/front-view-male-doctor_23-2148847716.jpg" alt="Surgical Specialist" onerror="this.src='{% static 'images/doc.png' %}'" />
+                    </div>
+                </div>
+
+                <!-- Banner Slide 6 - Emergency Services -->
+                <div class="banner" data-specialty="emergency">
+                    <div class="banner-left">
+                        <h1>24/7 Emergency<br />Services</h1>
+                        <p class="w-75 m-auto">
+                            Round-the-clock emergency medical services with fully equipped ambulances,
+                            trauma care units, and experienced emergency physicians ready to handle
+                            all medical emergencies.
+                        </p>
+                    </div>
+                    <div class="banner-img">
+                        <img class="bn-img" src="https://img.freepik.com/free-photo/medium-shot-doctor-with-stethoscope_23-2148816188.jpg" alt="Emergency Services" onerror="this.src='{% static 'images/doc.png' %}'" />
+                    </div>
+                </div>
+
+                <!-- Banner Slide 7 - Maternity Care -->
+                <div class="banner" data-specialty="maternity">
+                    <div class="banner-left">
+                        <h1>Comprehensive<br />Maternity Care</h1>
+                        <p class="w-75 m-auto">
+                            Complete prenatal and postnatal care with experienced obstetricians.
+                            Safe delivery services, NICU facilities, and dedicated support throughout
+                            your pregnancy journey.
+                        </p>
+                    </div>
+                    <div class="banner-img">
+                        <img class="bn-img" src="https://img.freepik.com/free-photo/woman-doctor-wearing-lab-coat-with-stethoscope-isolated_1303-29791.jpg" alt="Maternity Specialist" onerror="this.src='{% static 'images/doc.png' %}'" />
+                    </div>
+                </div>
+
+                <!-- Banner Navigation Arrows -->
+                <button class="banner-arrow banner-arrow-left" id="prevBanner" aria-label="Previous banner">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="banner-arrow banner-arrow-right" id="nextBanner" aria-label="Next banner">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+
+                <!-- Play/Pause Control -->
+                <button class="banner-play-pause" id="playPauseBanner" aria-label="Pause carousel">
+                    <i class="fas fa-pause"></i>
+                </button>
+
+                <!-- Banner Dots -->
+                <div class="banner-dots" id="bannerDots"></div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Quick Access Features Section -->
+        <div class="features-section py-5">
+            <div class="container">
+                <h1 class="title text-center mb-4">Quick Access Features</h1>
+                <p class="description text-center mb-5">
+                    Access our specialized healthcare services quickly and easily
+                </p>
+                <div class="row g-4">
+                    <!-- Admin -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="feature-card text-center p-4 h-100">
+                            <a href="/admin" class="text-decoration-none">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-user-shield fa-3x text-primary"></i>
+                                </div>
+                                <h5 class="feature-title">Admin Panel</h5>
+                                <p class="feature-desc">Manage system settings</p>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Doctors -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="feature-card text-center p-4 h-100">
+                            <a href="{% url 'doctors_page' %}" class="text-decoration-none">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-user-md fa-3x text-success"></i>
+                                </div>
+                                <h5 class="feature-title">Find Doctors</h5>
+                                <p class="feature-desc">Browse our specialists</p>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Patient -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="feature-card text-center p-4 h-100">
+                            <a href="{% url 'user_details' %}" class="text-decoration-none">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-hospital-user fa-3x text-info"></i>
+                                </div>
+                                <h5 class="feature-title">Patient Portal</h5>
+                                <p class="feature-desc">View your health records</p>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Emergency -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="feature-card text-center p-4 h-100">
+                            <a href="/emergency/" class="text-decoration-none">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-ambulance fa-3x text-danger"></i>
+                                </div>
+                                <h5 class="feature-title">Emergency</h5>
+                                <p class="feature-desc">24/7 emergency care</p>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Contact Us -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="feature-card text-center p-4 h-100">
+                            <a href="{% url 'contact_us_page' %}" class="text-decoration-none">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-phone-alt fa-3x text-warning"></i>
+                                </div>
+                                <h5 class="feature-title">Contact Us</h5>
+                                <p class="feature-desc">Get in touch with us</p>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Blood Bank -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="feature-card text-center p-4 h-100">
+                            <a href="/blood_bank/" class="text-decoration-none">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-tint fa-3x text-danger"></i>
+                                </div>
+                                <h5 class="feature-title">Blood Bank</h5>
+                                <p class="feature-desc">Donate or request blood</p>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Vaccine Management -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="feature-card text-center p-4 h-100">
+                            <a href="{% url 'vaccination' %}" class="text-decoration-none">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-syringe fa-3x text-primary"></i>
+                                </div>
+                                <h5 class="feature-title">Vaccination</h5>
+                                <p class="feature-desc">Book vaccination slots</p>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Burn Unit -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="feature-card text-center p-4 h-100">
+                            <a href="/burn_unit/" class="text-decoration-none">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-fire-extinguisher fa-3x text-warning"></i>
+                                </div>
+                                <h5 class="feature-title">Burn Unit</h5>
+                                <p class="feature-desc">Specialized burn care</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Section -->
+        <div class="service-section py-5" id="services">
+            <div class="container">
+                <h1 class="title">Services We Provide</h1>
+                <p class="description">
+                    Comprehensive healthcare services tailored to your needs with
+                    state-of-the-art medical technology and experienced professionals.
+                </p>
+                <div class="services-carousel-wrapper">
+                    <button class="carousel-arrow carousel-arrow-left" id="prevService" aria-label="Previous services">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="services-carousel">
+                        <div class="services-track" id="servicesTrack">
+                            <!-- Services will be dynamically loaded here -->
+                        </div>
+                    </div>
+                    <button class="carousel-arrow carousel-arrow-right" id="nextService" aria-label="Next services">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="carousel-dots" id="serviceDots"></div>
+            </div>
+        </div>
+
+        <!-- Service Detail Modal -->
+        <div id="serviceModal" class="service-modal">
+            <div class="service-modal-content">
+                <span class="service-modal-close" onclick="closeServiceModal()">&times;</span>
+                <div class="service-modal-header">
+                    <div class="service-modal-icon" id="modalServiceIcon"></div>
+                    <h2 id="modalServiceTitle"></h2>
+                </div>
+                <div class="service-modal-body">
+                    <p id="modalServiceDescription"></p>
+                    <h3>Key Features:</h3>
+                    <ul id="modalServiceFeatures"></ul>
+                    <div class="service-modal-actions">
+                        <a href="{% url 'book_appointment' %}" class="modal-btn modal-btn-primary" onclick="closeServiceModal()">
+                            <i class="fas fa-calendar-check"></i> Book Appointment
+                        </a>
+                        <a href="#contact" class="modal-btn modal-btn-secondary" onclick="closeServiceModal()">
+                            <i class="fas fa-phone"></i> Contact Us
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="review-container p-5 mt-5 w-75 m-auto">
+            <h1 class="title">Client Reviews</h1>
+            <p class="description text-center w-50 m-auto">
+                Hear what our patients have to say about their experience with SmartCare.
+                Your health and satisfaction are our top priorities.
+            </p>
+            <div class="reviews">
+                <div class="swiffy-slider slider-item-show2 slider-item-reveal slider-nav-outside
+                            slider-nav-round slider-nav-visible slider-indicators-outside
+                            slider-indicators-round slider-indicators-dark slider-nav-animation
+                            slider-nav-animation-fadein slider-item-first-visible">
+                    <ul id="review-container" class="slider-container py-4"></ul>
+                    <button type="button" class="slider-nav" aria-label="Go left"></button>
+                    <button type="button" class="slider-nav slider-nav-next" aria-label="Go right"></button>
+                    <div class="slider-indicators">
+                        <button class="active" aria-label="Go to slide"></button>
+                        <button aria-label="Go to slide"></button>
+                        <button aria-label="Go to slide"></button>
+                        <button aria-label="Go to slide"></button>
+                        <button aria-label="Go to slide"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="p-5" id="contact">
+        <div class="container w-75 m-auto row p-5">
+            <div class="col-md-6">
+                <h3 class="mb-3">SmartCare</h3>
+                <p><small>Copyright © SmartCare. All Rights Reserved</small></p>
+                <h5 class="mt-4">Follow Us</h5>
+                <div class="icons">
+                    <a href="https://www.linkedin.com" target="_blank"><i class="fab fa-linkedin fa-2x"></i></a>
+                    <a href="https://www.youtube.com" target="_blank"><i class="fab fa-youtube fa-2x"></i></a>
+                    <a href="https://www.facebook.com" target="_blank"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="https://www.twitter.com" target="_blank"><i class="fab fa-twitter fa-2x"></i></a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <h5>Company</h5>
+                <ul>
+                    <li><a href="{% url 'about_page' %}">About</a></li>
+                    <li><a href="{% url 'contact_us_page' %}">Contact Us</a></li>
+                    <li><a href="{% url 'careers_page' %}">Careers</a></li>
+                    <li><a href="{% url 'blog_page' %}">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Resources</h5>
+                <ul>
+                    <li><a href="{% url 'health_tips_page' %}">Health Tips</a></li>
+                    <li><a href="{% url 'doctors_page' %}">Find a Doctor</a></li>
+                    <li><a href="{% url 'all_appointments' %}">Appointments</a></li>
+                    <li><a href="{% url 'faq_page' %}">FAQ</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr />
+        <p class="text-center mt-3">
+            <small>Copyright © SmartCare 2024. All Rights Reserved</small>
+        </p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/swiffy-slider@1.6.0/dist/js/swiffy-slider.min.js"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.js"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/docDetails.js' %}"></script>
+    <script src="{% static 'js/logout.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+            crossorigin="anonymous"></script>
+</body>
+</html>

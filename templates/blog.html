@@ -1,0 +1,330 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - SmartCare</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+</head>
+<body>
+    <header>
+        <!-- Navigation Bar -->
+        <nav class="d-flex justify-content-around align-items-center p-4">
+            <div class="logo-container d-flex align-items-center gap-2">
+                <img src="{% static 'images/stethoscope 1.png' %}" alt="SmartCare Logo" />
+                <h3>SmartCare</h3>
+            </div>
+            <div class="menu-container d-flex gap-3 align-items-center">
+                <ul class="d-flex gap-3 list-unstyled mb-0">
+                    <li class="menu"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="menu"><a href="#services">Services</a></li>
+                    <li class="menu"><a href="#contact">Contact us</a></li>
+                    {% if not user.is_authenticated %}
+                    <li class="menu"><a href="{% url 'login' %}">Login</a></li>
+                    {% endif %}
+                </ul>
+                {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                            id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user"></i> Profile
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'user_details' %}">
+                                <i class="fas fa-user-circle"></i> My Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'all_appointments' %}">
+                                <i class="fas fa-calendar-check"></i> All Appointments
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li onclick="handlelogOut()">
+                            <a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Blog Section -->
+        <div class="container py-5">
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <h1 class="display-4 mb-3">SmartCare Blog</h1>
+                    <p class="lead text-muted">Latest news, health tips, and medical insights</p>
+                </div>
+            </div>
+
+            <!-- Featured Post -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="card shadow-lg">
+                        <div class="card-body p-4">
+                            <span class="badge bg-primary mb-2">Featured</span>
+                            <h2 class="card-title">The Importance of Regular Health Checkups</h2>
+                            <p class="text-muted">
+                                <i class="fas fa-calendar"></i> December 1, 2024 |
+                                <i class="fas fa-user"></i> Dr. Sarah Ahmed
+                            </p>
+                            <p class="card-text">
+                                Regular health checkups are essential for maintaining good health and preventing
+                                serious illnesses. During a checkup, your doctor can detect potential health issues
+                                before they become serious problems. Early detection of diseases like diabetes,
+                                high blood pressure, and cancer can significantly improve treatment outcomes...
+                            </p>
+                            <a href="{% url 'blog_detail_page' 1 %}" class="btn btn-primary">Read More <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blog Posts Grid -->
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <span class="badge bg-success mb-2">Nutrition</span>
+                            <h5 class="card-title">Top 10 Superfoods for a Healthy Heart</h5>
+                            <p class="text-muted small">
+                                <i class="fas fa-calendar"></i> November 28, 2024
+                            </p>
+                            <p class="card-text">
+                                Discover the best foods that can help maintain cardiovascular health
+                                and reduce the risk of heart disease. From omega-3 rich fish to
+                                antioxidant-packed berries...
+                            </p>
+                            <a href="{% url 'blog_detail_page' 2 %}" class="btn btn-outline-primary btn-sm">Read More</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <span class="badge bg-info mb-2">Wellness</span>
+                            <h5 class="card-title">Managing Stress: Tips from Our Experts</h5>
+                            <p class="text-muted small">
+                                <i class="fas fa-calendar"></i> November 25, 2024
+                            </p>
+                            <p class="card-text">
+                                Learn effective stress management techniques recommended by our
+                                mental health professionals. From meditation to exercise, discover
+                                what works best for you...
+                            </p>
+                            <a href="{% url 'blog_detail_page' 3 %}" class="btn btn-outline-primary btn-sm">Read More</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <span class="badge bg-warning mb-2">Prevention</span>
+                            <h5 class="card-title">Flu Season: How to Protect Yourself</h5>
+                            <p class="text-muted small">
+                                <i class="fas fa-calendar"></i> November 22, 2024
+                            </p>
+                            <p class="card-text">
+                                As flu season approaches, learn about vaccination, hygiene practices,
+                                and other preventive measures to keep yourself and your family healthy
+                                this winter...
+                            </p>
+                            <a href="{% url 'blog_detail_page' 4 %}" class="btn btn-outline-primary btn-sm">Read More</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <span class="badge bg-danger mb-2">Emergency</span>
+                            <h5 class="card-title">When to Visit the Emergency Room</h5>
+                            <p class="text-muted small">
+                                <i class="fas fa-calendar"></i> November 20, 2024
+                            </p>
+                            <p class="card-text">
+                                Understanding when a medical situation requires immediate emergency
+                                care can save lives. Learn about warning signs that should never
+                                be ignored...
+                            </p>
+                            <a href="{% url 'blog_detail_page' 5 %}" class="btn btn-outline-primary btn-sm">Read More</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <span class="badge bg-primary mb-2">Pediatrics</span>
+                            <h5 class="card-title">Child Vaccination Schedule Guide</h5>
+                            <p class="text-muted small">
+                                <i class="fas fa-calendar"></i> November 18, 2024
+                            </p>
+                            <p class="card-text">
+                                A comprehensive guide to childhood vaccinations, explaining which
+                                vaccines your child needs and when. Keep your little ones protected
+                                with proper immunization...
+                            </p>
+                            <a href="{% url 'blog_detail_page' 6 %}" class="btn btn-outline-primary btn-sm">Read More</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <span class="badge bg-success mb-2">Fitness</span>
+                            <h5 class="card-title">Exercise Tips for a Healthier Lifestyle</h5>
+                            <p class="text-muted small">
+                                <i class="fas fa-calendar"></i> November 15, 2024
+                            </p>
+                            <p class="card-text">
+                                Regular physical activity is crucial for maintaining good health.
+                                Our fitness experts share practical tips to help you start and
+                                maintain an exercise routine...
+                            </p>
+                            <a href="{% url 'blog_detail_page' 7 %}" class="btn btn-outline-primary btn-sm">Read More</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <span class="badge bg-info mb-2">Mental Health</span>
+                            <h5 class="card-title">Understanding Depression and Anxiety</h5>
+                            <p class="text-muted small">
+                                <i class="fas fa-calendar"></i> November 12, 2024
+                            </p>
+                            <p class="card-text">
+                                Mental health is just as important as physical health. Learn about
+                                common mental health conditions, their symptoms, and available
+                                treatment options...
+                            </p>
+                            <a href="{% url 'blog_detail_page' 8 %}" class="btn btn-outline-primary btn-sm">Read More</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <span class="badge bg-warning mb-2">Diabetes</span>
+                            <h5 class="card-title">Living Well with Diabetes</h5>
+                            <p class="text-muted small">
+                                <i class="fas fa-calendar"></i> November 10, 2024
+                            </p>
+                            <p class="card-text">
+                                Managing diabetes doesn't mean giving up on quality of life. Discover
+                                practical tips for diet, exercise, and medication management to keep
+                                your blood sugar in check...
+                            </p>
+                            <a href="{% url 'blog_detail_page' 9 %}" class="btn btn-outline-primary btn-sm">Read More</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <span class="badge bg-danger mb-2">Women's Health</span>
+                            <h5 class="card-title">Prenatal Care: What to Expect</h5>
+                            <p class="text-muted small">
+                                <i class="fas fa-calendar"></i> November 8, 2024
+                            </p>
+                            <p class="card-text">
+                                Pregnancy is an exciting journey. Learn about the importance of
+                                prenatal care, necessary tests, and how to ensure a healthy
+                                pregnancy for both mother and baby...
+                            </p>
+                            <a href="{% url 'blog_detail_page' 10 %}" class="btn btn-outline-primary btn-sm">Read More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <nav aria-label="Blog pagination">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="{% url 'blog_page' %}" tabindex="-1">Previous</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="{% url 'blog_page' %}">1</a></li>
+                            <li class="page-item"><a class="page-link" href="{% url 'blog_page' %}">2</a></li>
+                            <li class="page-item"><a class="page-link" href="{% url 'blog_page' %}">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="{% url 'blog_page' %}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="p-5" id="contact">
+        <div class="container w-75 m-auto row p-5">
+            <div class="col-md-6">
+                <h3 class="mb-3">SmartCare</h3>
+                <p><small>Copyright © SmartCare. All Rights Reserved</small></p>
+                <h5 class="mt-4">Follow Us</h5>
+                <div class="icons">
+                    <a href="https://www.linkedin.com" target="_blank"><i class="fab fa-linkedin fa-2x"></i></a>
+                    <a href="https://www.youtube.com" target="_blank"><i class="fab fa-youtube fa-2x"></i></a>
+                    <a href="https://www.facebook.com" target="_blank"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="https://www.twitter.com" target="_blank"><i class="fab fa-twitter fa-2x"></i></a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <h5>Company</h5>
+                <ul>
+                    <li><a href="{% url 'about_page' %}">About</a></li>
+                    <li><a href="{% url 'contact_us_page' %}">Contact Us</a></li>
+                    <li><a href="{% url 'careers_page' %}">Careers</a></li>
+                    <li><a href="{% url 'blog_page' %}">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Resources</h5>
+                <ul>
+                    <li><a href="{% url 'health_tips_page' %}">Health Tips</a></li>
+                    <li><a href="{% url 'doctors_page' %}">Find a Doctor</a></li>
+                    <li><a href="{% url 'all_appointments' %}">Appointments</a></li>
+                    <li><a href="{% url 'faq_page' %}">FAQ</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr />
+        <p class="text-center mt-3">
+            <small>Copyright © SmartCare 2024. All Rights Reserved</small>
+        </p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+            crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,344 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms and Conditions - SmartCare</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+</head>
+<body>
+    <header>
+        <!-- Navigation Bar -->
+        <nav class="d-flex justify-content-around align-items-center p-4">
+            <div class="logo-container d-flex align-items-center gap-2">
+                <img src="{% static 'images/stethoscope 1.png' %}" alt="SmartCare Logo" />
+                <h3>SmartCare</h3>
+            </div>
+            <div class="menu-container d-flex gap-3 align-items-center">
+                <ul class="d-flex gap-3 list-unstyled mb-0">
+                    <li class="menu"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="menu"><a href="#services">Services</a></li>
+                    <li class="menu"><a href="#contact">Contact us</a></li>
+                    {% if not user.is_authenticated %}
+                    <li class="menu"><a href="{% url 'login' %}">Login</a></li>
+                    {% endif %}
+                </ul>
+                {% if user.is_authenticated %}
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                            id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user"></i> Profile
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'user_details' %}">
+                                <i class="fas fa-user-circle"></i> My Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'all_appointments' %}">
+                                <i class="fas fa-calendar-check"></i> All Appointments
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li onclick="handlelogOut()">
+                            <a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Terms and Conditions Section -->
+        <div class="container py-5">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <a href="{% url 'home' %}" class="btn btn-outline-primary mb-3">
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </a>
+                    <h1 class="display-4 mb-3">Terms and Conditions</h1>
+                    <p class="text-muted">
+                        <i class="fas fa-calendar"></i> Last Updated: December 5, 2024
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3"><i class="fas fa-file-contract text-primary"></i> 1. Acceptance of Terms</h2>
+                            <p>
+                                Welcome to SmartCare. By accessing and using our website and healthcare services,
+                                you accept and agree to be bound by the terms and provisions of this agreement.
+                                If you do not agree to abide by the terms of this agreement, you are not authorized
+                                to use or access our services.
+                            </p>
+                            <p>
+                                These Terms and Conditions govern your use of SmartCare's medical services, including
+                                appointment scheduling, consultations, medical records access, and any other healthcare
+                                services provided through our platform.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3"><i class="fas fa-user-md text-primary"></i> 2. Medical Services and Appointments</h2>
+                            <p><strong>2.1 Appointment Booking:</strong></p>
+                            <ul>
+                                <li>All appointments must be booked through our official platform or by contacting our reception directly</li>
+                                <li>Appointment times are subject to availability and confirmation by our medical staff</li>
+                                <li>We require at least 24 hours notice for appointment cancellations or rescheduling</li>
+                                <li>Failure to attend appointments without prior notice may result in a cancellation fee</li>
+                            </ul>
+                            <p><strong>2.2 Medical Consultations:</strong></p>
+                            <ul>
+                                <li>All medical consultations are provided by licensed and qualified healthcare professionals</li>
+                                <li>Consultations may be conducted in-person, via telemedicine, or through other approved methods</li>
+                                <li>Medical advice provided is based on the information you provide; accuracy is essential</li>
+                                <li>Emergency medical situations should be directed to emergency services (911) immediately</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3"><i class="fas fa-shield-alt text-primary"></i> 3. Patient Rights and Responsibilities</h2>
+                            <p><strong>3.1 Your Rights:</strong></p>
+                            <ul>
+                                <li>Right to receive quality healthcare services without discrimination</li>
+                                <li>Right to privacy and confidentiality of your medical information</li>
+                                <li>Right to access your medical records in accordance with applicable laws</li>
+                                <li>Right to be informed about treatment options, risks, and benefits</li>
+                                <li>Right to refuse treatment or procedures</li>
+                                <li>Right to seek a second opinion from another qualified healthcare provider</li>
+                            </ul>
+                            <p><strong>3.2 Your Responsibilities:</strong></p>
+                            <ul>
+                                <li>Provide accurate and complete medical history and current health information</li>
+                                <li>Follow prescribed treatment plans and medical instructions</li>
+                                <li>Attend scheduled appointments or provide timely cancellation notice</li>
+                                <li>Respect healthcare staff, other patients, and facility property</li>
+                                <li>Make timely payment for services rendered</li>
+                                <li>Update your contact and insurance information as needed</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3"><i class="fas fa-lock text-primary"></i> 4. Privacy and Confidentiality</h2>
+                            <p>
+                                SmartCare is committed to protecting your privacy and maintaining the confidentiality
+                                of your medical information in accordance with HIPAA (Health Insurance Portability and
+                                Accountability Act) and other applicable privacy laws.
+                            </p>
+                            <ul>
+                                <li>Your medical records are kept strictly confidential and secure</li>
+                                <li>Information may only be shared with authorized healthcare providers involved in your care</li>
+                                <li>We will not disclose your information to third parties without your explicit consent,
+                                    except as required by law</li>
+                                <li>You have the right to review our complete Privacy Policy for detailed information</li>
+                            </ul>
+                            <p>
+                                For more information, please review our
+                                <a href="{% url 'privacy_page' %}">Privacy Policy</a>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3"><i class="fas fa-credit-card text-primary"></i> 5. Payment and Insurance</h2>
+                            <p><strong>5.1 Payment Terms:</strong></p>
+                            <ul>
+                                <li>Payment is due at the time of service unless prior arrangements have been made</li>
+                                <li>We accept cash, credit cards, debit cards, and approved insurance plans</li>
+                                <li>Patients are responsible for any charges not covered by insurance</li>
+                                <li>Outstanding balances may be subject to late fees and collection procedures</li>
+                            </ul>
+                            <p><strong>5.2 Insurance:</strong></p>
+                            <ul>
+                                <li>We work with most major insurance providers</li>
+                                <li>Please verify that we accept your insurance before scheduling appointments</li>
+                                <li>You are responsible for understanding your insurance coverage and benefits</li>
+                                <li>Co-payments, deductibles, and non-covered services must be paid by the patient</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3"><i class="fas fa-exclamation-triangle text-primary"></i> 6. Limitation of Liability</h2>
+                            <p>
+                                While SmartCare strives to provide the highest quality healthcare services, we cannot
+                                guarantee specific medical outcomes. Medical care involves inherent risks and uncertainties.
+                            </p>
+                            <ul>
+                                <li>SmartCare and its staff are not liable for outcomes beyond reasonable medical care standards</li>
+                                <li>We are not responsible for complications arising from patient non-compliance with treatment plans</li>
+                                <li>Technical issues with our online platform or telemedicine services may occasionally occur</li>
+                                <li>Emergency situations require immediate emergency services; our platform is not for emergencies</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3"><i class="fas fa-laptop text-primary"></i> 7. Website and Platform Use</h2>
+                            <p><strong>7.1 User Account:</strong></p>
+                            <ul>
+                                <li>You are responsible for maintaining the confidentiality of your account credentials</li>
+                                <li>You must notify us immediately of any unauthorized access to your account</li>
+                                <li>You are responsible for all activities that occur under your account</li>
+                                <li>Sharing account credentials is strictly prohibited</li>
+                            </ul>
+                            <p><strong>7.2 Acceptable Use:</strong></p>
+                            <ul>
+                                <li>You agree to use our platform only for lawful purposes</li>
+                                <li>Harassment, abuse, or threatening behavior towards staff or other users is prohibited</li>
+                                <li>Attempting to access unauthorized areas of our system is prohibited</li>
+                                <li>You may not use our platform to transmit malicious software or harmful content</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3"><i class="fas fa-copyright text-primary"></i> 8. Intellectual Property</h2>
+                            <p>
+                                All content on the SmartCare website, including text, graphics, logos, images, and software,
+                                is the property of SmartCare or its content suppliers and is protected by copyright and
+                                intellectual property laws.
+                            </p>
+                            <ul>
+                                <li>You may not reproduce, distribute, or create derivative works without written permission</li>
+                                <li>Trademarks and service marks displayed are registered and unregistered marks of SmartCare</li>
+                                <li>Medical content is for informational purposes only and should not replace professional advice</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3"><i class="fas fa-edit text-primary"></i> 9. Changes to Terms</h2>
+                            <p>
+                                SmartCare reserves the right to modify these Terms and Conditions at any time. Changes
+                                will be effective immediately upon posting to our website. Your continued use of our
+                                services after changes are posted constitutes acceptance of the modified terms.
+                            </p>
+                            <ul>
+                                <li>We will notify users of significant changes via email or website notification</li>
+                                <li>It is your responsibility to review these terms periodically</li>
+                                <li>The "Last Updated" date at the top indicates when changes were last made</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3"><i class="fas fa-gavel text-primary"></i> 10. Governing Law and Disputes</h2>
+                            <p>
+                                These Terms and Conditions are governed by and construed in accordance with the laws
+                                of the jurisdiction in which SmartCare operates. Any disputes arising from these terms
+                                or your use of our services will be resolved through the appropriate legal channels.
+                            </p>
+                            <ul>
+                                <li>Both parties agree to attempt resolution through good-faith negotiation first</li>
+                                <li>Medical malpractice claims are subject to specific legal procedures and time limits</li>
+                                <li>For non-emergency concerns, please contact our patient relations department</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h4 mb-3"><i class="fas fa-phone text-primary"></i> 11. Contact Information</h2>
+                            <p>
+                                If you have any questions about these Terms and Conditions, please contact us:
+                            </p>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-envelope"></i> Email: legal@smartcare.com</li>
+                                <li><i class="fas fa-phone"></i> Phone: +880 123-456-7890</li>
+                                <li><i class="fas fa-map-marker-alt"></i> Address: SmartCare Medical Center, Healthcare District</li>
+                            </ul>
+                            <p class="mb-0">
+                                <a href="{% url 'contact_us_page' %}" class="btn btn-primary">
+                                    <i class="fas fa-envelope"></i> Contact Us
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Important:</strong> By using SmartCare's services, you acknowledge that you have read,
+                        understood, and agree to be bound by these Terms and Conditions.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="p-5" id="contact">
+        <div class="container w-75 m-auto row p-5">
+            <div class="col-md-6">
+                <h3 class="mb-3">SmartCare</h3>
+                <p><small>Copyright © SmartCare. All Rights Reserved</small></p>
+                <h5 class="mt-4">Follow Us</h5>
+                <div class="icons">
+                    <a href="https://www.linkedin.com" target="_blank"><i class="fab fa-linkedin fa-2x"></i></a>
+                    <a href="https://www.youtube.com" target="_blank"><i class="fab fa-youtube fa-2x"></i></a>
+                    <a href="https://www.facebook.com" target="_blank"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="https://www.twitter.com" target="_blank"><i class="fab fa-twitter fa-2x"></i></a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <h5>Company</h5>
+                <ul>
+                    <li><a href="{% url 'about_page' %}">About</a></li>
+                    <li><a href="{% url 'contact_us_page' %}">Contact Us</a></li>
+                    <li><a href="{% url 'careers_page' %}">Careers</a></li>
+                    <li><a href="{% url 'blog_page' %}">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Resources</h5>
+                <ul>
+                    <li><a href="{% url 'health_tips_page' %}">Health Tips</a></li>
+                    <li><a href="{% url 'doctors_page' %}">Find a Doctor</a></li>
+                    <li><a href="{% url 'all_appointments' %}">Appointments</a></li>
+                    <li><a href="{% url 'faq_page' %}">FAQ</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr />
+        <p class="text-center mt-3">
+            <small>Copyright © SmartCare 2024. All Rights Reserved</small>
+        </p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+            crossorigin="anonymous"></script>
+</body>
+</html>

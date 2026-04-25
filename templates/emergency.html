@@ -1,0 +1,493 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Emergency Services - SmartCare</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <style>
+        .emergency-header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .emergency-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .emergency-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .emergency-contact {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .ambulance-card {
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            background: #f8f9fa;
+        }
+
+        .request-form {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .emergency-type-btn {
+            width: 100%;
+            margin: 10px 0;
+            padding: 15px;
+            font-size: 16px;
+        }
+
+        .status-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .status-pending { background: #ffc107; color: #000; }
+        .status-accepted { background: #28a745; color: #fff; }
+        .status-completed { background: #17a2b8; color: #fff; }
+        .status-cancelled { background: #6c757d; color: #fff; }
+    </style>
+</head>
+<body>
+    <header>
+        <!-- Navigation Bar -->
+        <nav class="d-flex justify-content-around align-items-center p-4">
+            <div class="logo-container d-flex align-items-center gap-2">
+                <img src="{% static 'images/stethoscope 1.png' %}" alt="SmartCare Logo" />
+                <h3>SmartCare</h3>
+            </div>
+            <div class="menu-container d-flex gap-3 align-items-center">
+                <ul class="d-flex gap-3 list-unstyled mb-0">
+                    <li class="menu"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="menu"><a href="#emergency-contacts">Emergency Contacts</a></li>
+                    <li class="menu"><a href="{% url 'login' %}">Login</a></li>
+                </ul>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                            id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user"></i> Profile
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'user_details' %}">
+                                <i class="fas fa-user-circle"></i> My Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#my-requests">
+                                <i class="fas fa-list"></i> My Requests
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li onclick="handlelogOut()">
+                            <a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Emergency Header -->
+    <div class="emergency-header">
+        <div class="container">
+            <h1><i class="fas fa-ambulance"></i> Emergency Services</h1>
+            <p class="lead">24/7 Emergency Medical Assistance</p>
+            <h2 class="mt-3"><i class="fas fa-phone-alt"></i> Call: 999</h2>
+        </div>
+    </div>
+
+    <main class="container my-5">
+        <!-- Emergency Request Form -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="emergency-card">
+                    <h2 class="text-danger mb-4">
+                        <i class="fas fa-exclamation-triangle"></i> Request Emergency Service
+                    </h2>
+                    <div class="request-form">
+                        <form id="emergencyForm">
+                            <div class="mb-3">
+                                <label class="form-label">Emergency Type</label>
+                                <select class="form-select" id="emergencyType" required>
+                                    <option value="">Select emergency type...</option>
+                                    <option value="Medical Emergency">Medical Emergency</option>
+                                    <option value="Accident">Accident</option>
+                                    <option value="Heart Attack">Heart Attack</option>
+                                    <option value="Stroke">Stroke</option>
+                                    <option value="Respiratory Distress">Respiratory Distress</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Location</label>
+                                <input type="text" class="form-control" id="location"
+                                       placeholder="Enter your current location" required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Contact Number</label>
+                                <input type="tel" class="form-control" id="contactNumber"
+                                       placeholder="Enter contact number" required />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" id="description" rows="4"
+                                          placeholder="Describe the emergency situation..." required></textarea>
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="needAmbulance" checked />
+                                <label class="form-check-label" for="needAmbulance">
+                                    I need an ambulance
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn btn-danger btn-lg w-100">
+                                <i class="fas fa-paper-plane"></i> Submit Emergency Request
+                            </button>
+                        </form>
+                        <div id="successMessage" class="alert alert-success mt-3" style="display: none;">
+                            <i class="fas fa-check-circle"></i> Emergency request submitted successfully!
+                        </div>
+                        <div id="errorMessage" class="alert alert-danger mt-3" style="display: none;">
+                            <i class="fas fa-exclamation-circle"></i> <span id="errorText"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Emergency Requests -->
+                <div class="emergency-card mt-4" id="my-requests">
+                    <h3><i class="fas fa-list-ul"></i> My Emergency Requests</h3>
+                    <div id="requestsList" class="mt-3">
+                        <!-- Requests will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-md-4">
+                <!-- Available Ambulances -->
+                <div class="emergency-card">
+                    <h4 class="text-success">
+                        <i class="fas fa-ambulance"></i> Available Ambulances
+                    </h4>
+                    <div id="ambulancesList" class="mt-3">
+                        <!-- Ambulances will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Emergency Contacts -->
+                <div class="emergency-card mt-4" id="emergency-contacts">
+                    <h4 class="text-warning">
+                        <i class="fas fa-phone"></i> Emergency Contacts
+                    </h4>
+                    <div id="contactsList" class="mt-3">
+                        <!-- Contacts will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Quick Tips -->
+                <div class="emergency-card mt-4 bg-info text-white">
+                    <h5><i class="fas fa-info-circle"></i> Emergency Tips</h5>
+                    <ul class="mt-3">
+                        <li>Stay calm and assess the situation</li>
+                        <li>Call emergency services immediately</li>
+                        <li>Provide clear location information</li>
+                        <li>Don't move injured persons unless necessary</li>
+                        <li>Follow dispatcher instructions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="p-5 bg-dark text-white">
+        <div class="container text-center">
+            <h3>SmartCare Emergency Services</h3>
+            <p><small>Available 24/7 for your medical emergencies</small></p>
+            <div class="icons mt-3">
+                <a href="https://www.linkedin.com" target="_blank" class="text-white mx-2"><i class="fab fa-linkedin fa-2x"></i></a>
+                <a href="https://www.youtube.com" target="_blank" class="text-white mx-2"><i class="fab fa-youtube fa-2x"></i></a>
+                <a href="https://www.facebook.com" target="_blank" class="text-white mx-2"><i class="fab fa-facebook fa-2x"></i></a>
+                <a href="https://www.twitter.com" target="_blank" class="text-white mx-2"><i class="fab fa-twitter fa-2x"></i></a>
+            </div>
+            <hr class="my-4" />
+            <p><small>Copyright © SmartCare 2024. All Rights Reserved</small></p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/auth.js' %}"></script>
+    <script src="{% static 'js/logout.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+            crossorigin="anonymous"></script>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+
+        // Get token from localStorage
+        const getToken = () => localStorage.getItem('token');
+
+        // Load available ambulances
+        async function loadAmbulances() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/emergency/api/ambulances/available/`);
+                const data = await response.json();
+
+                const ambulancesList = document.getElementById('ambulancesList');
+                if (data.length === 0) {
+                    ambulancesList.innerHTML = '<p class="text-muted">No ambulances available</p>';
+                    return;
+                }
+
+                ambulancesList.innerHTML = data.map(ambulance => `
+                    <div class="ambulance-card">
+                        <h6><i class="fas fa-ambulance text-success"></i> ${ambulance.vehicle_number}</h6>
+                        <p class="mb-1"><strong>Hospital:</strong> ${ambulance.hospital_name}</p>
+                        <p class="mb-1"><strong>Driver:</strong> ${ambulance.driver_name}</p>
+                        <p class="mb-0"><strong>Contact:</strong> ${ambulance.driver_phone}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading ambulances:', error);
+            }
+        }
+
+        // Load emergency contacts
+        async function loadContacts() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/emergency/api/contacts/`);
+                const data = await response.json();
+
+                const contactsList = document.getElementById('contactsList');
+                if (data.length === 0) {
+                    contactsList.innerHTML = '<p class="text-muted">No contacts available</p>';
+                    return;
+                }
+
+                contactsList.innerHTML = data.map(contact => `
+                    <div class="emergency-contact">
+                        <h6><i class="fas fa-hospital"></i> ${contact.name}</h6>
+                        <p class="mb-1"><strong>Phone:</strong> ${contact.phone}</p>
+                        ${contact.is_24x7 ? '<span class="badge bg-success">24/7 Available</span>' : ''}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+            }
+        }
+
+        // Load user's emergency requests
+        async function loadMyRequests() {
+            const token = getToken();
+            if (!token) {
+                document.getElementById('requestsList').innerHTML =
+                    '<p class="text-muted">Please login to view your requests</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/emergency/api/requests/`, {
+                    headers: {
+                        'Authorization': `Token ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to load requests');
+
+                const data = await response.json();
+                const requestsList = document.getElementById('requestsList');
+
+                if (data.length === 0) {
+                    requestsList.innerHTML = '<p class="text-muted">No emergency requests yet</p>';
+                    return;
+                }
+
+                requestsList.innerHTML = data.map(request => `
+                    <div class="emergency-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6>${request.emergency_type}</h6>
+                                <p class="mb-1"><i class="fas fa-map-marker-alt"></i> ${request.location}</p>
+                                <p class="mb-1"><i class="fas fa-phone"></i> ${request.contact_number}</p>
+                                <p class="mb-1"><small>${request.description}</small></p>
+                                <p class="mb-0"><small class="text-muted">
+                                    ${new Date(request.created_at).toLocaleString()}
+                                </small></p>
+                            </div>
+                            <span class="status-badge status-${request.status.toLowerCase()}">
+                                ${request.status}
+                            </span>
+                        </div>
+                        ${request.assigned_ambulance ? `
+                            <div class="alert alert-success mt-2">
+                                <strong>Ambulance Assigned:</strong> ${request.assigned_ambulance.vehicle_number}
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading requests:', error);
+                document.getElementById('requestsList').innerHTML =
+                    '<p class="text-danger">Please login to view your requests</p>';
+            }
+        }
+
+        // Submit emergency request
+        document.getElementById('emergencyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const token = getToken();
+            console.log('Token:', token ? 'Token exists' : 'No token found');
+
+            if (!token) {
+                document.getElementById('errorText').textContent = 'Please login to submit an emergency request';
+                document.getElementById('errorMessage').style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = '/login/';
+                }, 2000);
+                return;
+            }
+
+            const formData = {
+                emergency_type: document.getElementById('emergencyType').value,
+                location: document.getElementById('location').value,
+                contact_number: document.getElementById('contactNumber').value,
+                description: document.getElementById('description').value
+            };
+
+            console.log('Submitting form data:', formData);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/emergency/api/requests/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Token ${token}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                console.log('Response status:', response.status);
+                console.log('Response data:', data);
+
+                if (!response.ok) {
+                    // Show detailed error message from backend
+                    let errorMsg = 'Failed to submit request. ';
+                    if (data.detail) {
+                        errorMsg += data.detail;
+                    } else if (data.error) {
+                        errorMsg += data.error;
+                    } else if (typeof data === 'object') {
+                        errorMsg += Object.entries(data).map(([key, value]) => `${key}: ${value}`).join(', ');
+                    } else {
+                        errorMsg += 'Please try again.';
+                    }
+                    console.error('Error message:', errorMsg);
+                    throw new Error(errorMsg);
+                }
+
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('emergencyForm').reset();
+                document.getElementById('errorMessage').style.display = 'none';
+
+                setTimeout(() => {
+                    document.getElementById('successMessage').style.display = 'none';
+                    loadMyRequests();
+                }, 2000);
+            } catch (error) {
+                console.error('Error submitting request:', error);
+                document.getElementById('errorText').textContent = error.message || 'Failed to submit request. Please try again.';
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        });
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAmbulances();
+            loadContacts();
+            loadMyRequests();
+        });
+    </script>
+
+    <!-- Footer -->
+    <footer class="p-5 mt-5" id="contact">
+        <div class="container w-75 m-auto row p-5">
+            <div class="col-md-6">
+                <h3 class="mb-3">SmartCare</h3>
+                <p><small>Copyright © SmartCare. All Rights Reserved</small></p>
+                <h5 class="mt-4">Follow Us</h5>
+                <div class="icons">
+                    <a href="https://www.linkedin.com" target="_blank"><i class="fab fa-linkedin fa-2x"></i></a>
+                    <a href="https://www.youtube.com" target="_blank"><i class="fab fa-youtube fa-2x"></i></a>
+                    <a href="https://www.facebook.com" target="_blank"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="https://www.twitter.com" target="_blank"><i class="fab fa-twitter fa-2x"></i></a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <h5>Company</h5>
+                <ul>
+                    <li><a href="{% url 'about_page' %}">About</a></li>
+                    <li><a href="{% url 'contact_us_page' %}">Contact Us</a></li>
+                    <li><a href="{% url 'careers_page' %}">Careers</a></li>
+                    <li><a href="{% url 'blog_page' %}">Blog</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h5>Resources</h5>
+                <ul>
+                    <li><a href="{% url 'health_tips_page' %}">Health Tips</a></li>
+                    <li><a href="{% url 'doctors_page' %}">Find a Doctor</a></li>
+                    <li><a href="{% url 'all_appointments' %}">Appointments</a></li>
+                    <li><a href="{% url 'faq_page' %}">FAQ</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr />
+        <p class="text-center mt-3">
+            <small>Copyright © SmartCare 2024. All Rights Reserved</small>
+        </p>
+    </footer>
+</body>
+</html>
